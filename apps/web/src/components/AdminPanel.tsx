@@ -155,7 +155,7 @@ export function AdminPanel({ onBack }: Props) {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0D0D0D] text-slate-900 flex" style={{ fontFamily: "'Inter',sans-serif" }}>
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex" style={{ fontFamily: "'Inter',sans-serif" }}>
 
       {/* ── Toast ────────────────────────────────────────────────── */}
       {toast && (
@@ -236,14 +236,14 @@ export function AdminPanel({ onBack }: Props) {
       )}
 
       {/* ── Sidebar ───────────────────────────────────────────────── */}
-      <aside className="w-60 shrink-0 bg-[#111111] border-r border-slate-200 flex flex-col">
-        <div className="p-5 border-b border-slate-200">
+      <aside className="w-60 shrink-0 bg-slate-900 border-r border-slate-800 flex flex-col">
+        <div className="p-5 border-b border-slate-800">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 bg-[#0F9D58] rounded-lg flex items-center justify-center">
               <Shield className="w-4 h-4 text-white" />
             </div>
             <div>
-              <p className="text-sm font-bold leading-none">InvoicePro</p>
+              <p className="text-sm font-bold leading-none text-white">InvoicePro</p>
               <p className="text-xs text-[#0F9D58] font-semibold mt-0.5">Admin Panel</p>
             </div>
           </div>
@@ -251,14 +251,14 @@ export function AdminPanel({ onBack }: Props) {
         <nav className="flex-1 p-3 space-y-1">
           {navItems.map(item => (
             <button key={item.id} onClick={() => setTab(item.id)}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${tab === item.id ? 'bg-[#0F9D58] text-white' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}>
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${tab === item.id ? 'bg-[#0F9D58] text-white' : 'text-slate-300 hover:text-white hover:bg-slate-800'}`}>
               {item.icon}{item.label}
             </button>
           ))}
         </nav>
-        <div className="p-3 border-t border-slate-200">
+        <div className="p-3 border-t border-slate-800">
           <button onClick={onBack}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition">
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition">
             <ArrowLeft className="w-4 h-4" />Back to App
           </button>
         </div>
@@ -267,7 +267,7 @@ export function AdminPanel({ onBack }: Props) {
       {/* ── Main ─────────────────────────────────────────────────── */}
       <main className="flex-1 overflow-auto flex flex-col">
         {/* Top bar */}
-        <div className="sticky top-0 z-10 bg-[#0D0D0D]/80 backdrop-blur-md border-b border-slate-200 px-8 py-4 flex items-center justify-between">
+        <div className="sticky top-0 z-10 bg-slate-50/80 backdrop-blur-md border-b border-slate-200 px-8 py-4 flex items-center justify-between">
           <div>
             <h1 className="text-lg font-bold capitalize">{tab}</h1>
             <p className="text-xs text-slate-500">InvoicePro Platform Management</p>
