@@ -91,72 +91,94 @@ export function LandingPage({ onGetStarted, onSignIn, onNavigate }: LandingPageP
   return (
     <div className="min-h-screen bg-[#F9FAFB] text-slate-900 font-sans antialiased">
       {/* ── NAV ────────────────────────────────────────────── */}
-      <header className="absolute top-0 w-full z-50 bg-transparent">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
-            {/* Logo */}
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-[#0F9D58] flex items-center justify-center">
-                <FileText className="w-4 h-4 text-white" />
-              </div>
-              <span className="font-bold text-lg tracking-tight text-white">InvoicePro</span>
+      <header className="sticky top-0 w-full z-50 bg-white border-b border-slate-200">
+        <div className="max-w-6xl mx-auto px-4 h-20 flex items-center justify-between">
+          {/* Logo */}
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-[#0F9D58] flex items-center justify-center">
+              <FileText className="w-4 h-4 text-white" />
             </div>
+            <span className="font-bold text-xl text-slate-900 tracking-tight">InvoicePro</span>
+          </div>
 
-            {/* Desktop nav */}
-            <nav className="hidden md:flex items-center gap-8">
-              {['Features', 'Pricing', 'Reviews'].map(link => (
-                <a
-                  key={link}
-                  href={`#${link.toLowerCase()}`}
-                  className="text-sm font-medium text-white/80 hover:text-white transition-colors"
-                >
-                  {link}
-                </a>
-              ))}
-            </nav>
-
-            {/* CTA buttons */}
-            <div className="hidden md:flex items-center gap-4">
+          {/* Desktop nav */}
+          <nav className="hidden md:flex items-center gap-8">
+            {['Features', 'Pricing', 'Reviews'].map(link => (
               <button
-                id="landing-signin-btn"
-                onClick={onSignIn}
-                className="text-sm font-medium text-white/80 hover:text-white transition-colors"
+                key={link}
+                onClick={() => {
+                  if (onNavigate) {
+                    onNavigate(link.toLowerCase());
+                  } else {
+                    document.getElementById(link.toLowerCase())?.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
+                className="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors"
               >
-                Sign In
+                {link}
               </button>
-              <button
-                id="landing-getstarted-btn"
-                onClick={onGetStarted}
-                className="text-sm font-semibold bg-[#0F9D58] hover:bg-[#0c864b] text-white px-5 py-2.5 rounded-lg transition-all"
-              >
-                Get Started Free
-              </button>
-            </div>
-
-            {/* Mobile menu toggle */}
+            ))}
             <button
-              className="md:hidden text-white/80 hover:text-white"
-              onClick={() => setMobileMenuOpen(v => !v)}
+              onClick={() => onNavigate && onNavigate('contact')}
+              className="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors"
             >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              Contact
+            </button>
+          </nav>
+
+          {/* Desktop Auth */}
+          <div className="hidden md:flex items-center gap-4">
+            <button onClick={onSignIn} className="text-sm font-bold text-slate-600 hover:text-slate-900 transition-colors">
+              Sign In
+            </button>
+            <button
+              onClick={onGetStarted}
+              className="bg-[#0F9D58] hover:bg-[#0c864b] text-white font-bold px-5 py-2.5 rounded-lg text-sm transition-all shadow-sm shadow-[#0F9D58]/20"
+            >
+              Get Started
             </button>
           </div>
-        </div>
 
-        {/* Mobile menu */}
-        {mobileMenuOpen && (
-          <div className="md:hidden bg-[#0B161E] px-4 py-4 space-y-4 shadow-xl absolute w-full top-20 border-t border-white/10">
-            {['Features', 'Pricing', 'Reviews'].map(link => (
-              <a key={link} href={`#${link.toLowerCase()}`} className="block text-sm font-medium text-white/80 hover:text-white py-2" onClick={() => setMobileMenuOpen(false)}>
-                {link}
-              </a>
-            ))}
-            <div className="flex flex-col gap-3 pt-4 border-t border-white/10">
-              <button onClick={onSignIn} className="w-full text-sm font-medium text-white/80 hover:text-white py-2 transition-all text-left">Sign In</button>
-              <button onClick={onGetStarted} className="w-full text-sm font-semibold bg-[#0F9D58] hover:bg-[#0c864b] text-white py-3 rounded-lg transition-all text-center">Get Started Free</button>
+          {/* Mobile menu button */}
+          <button className="md:hidden text-slate-900" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+
+          {/* Mobile nav */}
+          {mobileMenuOpen && (
+            <div className="md:hidden bg-white px-4 py-4 space-y-4 shadow-xl absolute w-full top-20 border-t border-slate-100 left-0">
+              {['Features', 'Pricing', 'Reviews'].map(link => (
+                <button
+                  key={link}
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    if (onNavigate) {
+                      onNavigate(link.toLowerCase());
+                    } else {
+                      document.getElementById(link.toLowerCase())?.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  }}
+                  className="block w-full text-left text-sm font-medium text-slate-600 hover:text-slate-900 py-2"
+                >
+                  {link}
+                </button>
+              ))}
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  if (onNavigate) onNavigate('contact');
+                }}
+                className="block w-full text-left text-sm font-medium text-slate-600 hover:text-slate-900 py-2"
+              >
+                Contact
+              </button>
+              <div className="pt-4 border-t border-slate-100 flex flex-col gap-3">
+                <button onClick={onSignIn} className="text-sm font-bold text-slate-600 py-2 w-full text-center border border-slate-200 rounded-lg">Sign In</button>
+                <button onClick={onGetStarted} className="bg-[#0F9D58] text-white font-bold py-2.5 rounded-lg text-sm w-full text-center">Get Started</button>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </header>
 
       {/* ── HERO ───────────────────────────────────────────── */}

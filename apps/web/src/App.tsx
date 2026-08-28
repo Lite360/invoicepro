@@ -13,13 +13,17 @@ import { DocumentPreviewModal } from './components/DocumentPreviewModal';
 import { LoginPage } from './components/LoginPage';
 import { SignupPage } from './components/SignupPage';
 import { LandingPage } from './components/LandingPage';
+import { ContactPage } from './components/ContactPage';
+import { FeaturesPage } from './components/FeaturesPage';
+import { PricingPage } from './components/PricingPage';
+import { ReviewsPage } from './components/ReviewsPage';
 import { PrivacyPolicy } from './components/legal/PrivacyPolicy';
 import { Terms } from './components/legal/Terms';
 import { AmlKyc } from './components/legal/AmlKyc';
 import { RefundPolicy } from './components/legal/RefundPolicy';
 import { Company, User } from './types';
 
-type PageView = 'landing' | 'login' | 'signup' | 'privacy' | 'terms' | 'aml-kyc' | 'refund-policy';
+type PageView = 'landing' | 'login' | 'signup' | 'privacy' | 'terms' | 'aml-kyc' | 'refund-policy' | 'contact' | 'features' | 'pricing' | 'reviews';
 
 export function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -126,6 +130,24 @@ export function App() {
     if (pageView === 'terms') return <Terms onBack={() => setPageView('landing')} />;
     if (pageView === 'aml-kyc') return <AmlKyc onBack={() => setPageView('landing')} />;
     if (pageView === 'refund-policy') return <RefundPolicy onBack={() => setPageView('landing')} />;
+    if (pageView === 'features') {
+      return <FeaturesPage onNavigate={(view) => setPageView(view as PageView)} onSignIn={() => setPageView('login')} onGetStarted={() => setPageView('signup')} />;
+    }
+    if (pageView === 'pricing') {
+      return <PricingPage onNavigate={(view) => setPageView(view as PageView)} onSignIn={() => setPageView('login')} onGetStarted={() => setPageView('signup')} />;
+    }
+    if (pageView === 'reviews') {
+      return <ReviewsPage onNavigate={(view) => setPageView(view as PageView)} onSignIn={() => setPageView('login')} onGetStarted={() => setPageView('signup')} />;
+    }
+    if (pageView === 'contact') {
+      return (
+        <ContactPage
+          onNavigate={(view) => setPageView(view as PageView)}
+          onSignIn={() => setPageView('login')}
+          onGetStarted={() => setPageView('signup')}
+        />
+      );
+    }
     if (pageView === 'signup') {
       return (
         <SignupPage
