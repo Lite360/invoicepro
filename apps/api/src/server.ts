@@ -39,7 +39,7 @@ async function main() {
 
     if (process.env.ADMIN_EMAIL) {
         try {
-            await prisma.user.update({
+            await (prisma.user as any).update({
                 where: { email: process.env.ADMIN_EMAIL },
                 data: { role: 'ADMIN' }
             });
@@ -884,7 +884,7 @@ async function main() {
         try {
             await req.jwtVerify();
             const payload = req.user as { id: string; email: string; name: string };
-            const user = await prisma.user.findUnique({ where: { id: payload.id } });
+            const user = await prisma.user.findUnique({ where: { id: payload.id } }) as any;
             if (!user || user.role !== 'ADMIN') {
                 return reply.status(403).send({ error: 'Forbidden. Admin only.' });
             }
@@ -897,9 +897,9 @@ async function main() {
     app.get('/api/admin/stats', { preValidation: [isAdmin] }, async (req, reply) => {
         const [totalUsers, activeUsers, proUsers, businessUsers, totalDocuments, recentUsers] = await Promise.all([
             prisma.user.count(),
-            prisma.user.count({ where: { isActive: true } }),
-            prisma.user.count({ where: { plan: 'PRO' } }),
-            prisma.user.count({ where: { plan: 'BUSINESS' } }),
+            (prisma.user as any).count({ where: { isActive: true } }),
+            (prisma.user as any).count({ where: { plan: 'PRO' } }),
+            (prisma.user as any).count({ where: { plan: 'BUSINESS' } }),
             prisma.document.count(),
             prisma.user.findMany({ orderBy: { createdAt: 'desc' }, take: 8 })
         ]);
@@ -925,21 +925,21 @@ async function main() {
     });
 
     app.get('/api/admin/payments', { preValidation: [isAdmin] }, async (req, reply) => {
-        const payments = await prisma.payment.findMany({ orderBy: { createdAt: 'desc' } });
+        const payments = await (prisma as any).payment.findMany({ orderBy: { createdAt: 'desc' } });
         return reply.send(payments);
     });
 
     app.get('/api/admin/settings', { preValidation: [isAdmin] }, async (req, reply) => {
-        let settings = await prisma.adminSettings.findUnique({ where: { id: 'global' } });
+        let settings = await (prisma as any).adminSettings.findUnique({ where: { id: 'global' } });
         if (!settings) {
-            settings = await prisma.adminSettings.create({ data: { id: 'global' } });
+            settings = await (prisma as any).adminSettings.create({ data: { id: 'global' } });
         }
         return reply.send(settings);
     });
 
     app.put('/api/admin/settings', { preValidation: [isAdmin] }, async (req: any, reply) => {
         const data = req.body;
-        const settings = await prisma.adminSettings.upsert({
+        const settings = await (prisma as any).adminSettings.upsert({
             where: { id: 'global' },
             update: data,
             create: { id: 'global', ...data }
