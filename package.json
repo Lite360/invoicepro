@@ -8,7 +8,7 @@
         "dev:web": "npm run dev --prefix apps/web",
         "db:push": "npx prisma db push",
         "postinstall": "npx prisma generate",
-        "build": "npm run build:web && npm run build:api && node -e \"const fs = require('fs'); fs.rmSync('public', {recursive:true, force:true}); fs.cpSync('apps/web/dist', 'public', {recursive:true});\"",
+        "build": "npm run build:web && npm run build:api && node -e \"const fs = require('fs'); fs.rmSync('dist', {recursive:true, force:true}); fs.cpSync('apps/web/dist', 'dist', {recursive:true});\"",
         "build:web": "npm run build --prefix apps/web",
         "build:api": "tsc -p apps/api/tsconfig.json"
     },
@@ -18,5 +18,7 @@
         "prisma": "^5.14.0",
         "vite": "^5.0.0"
     },
-    "workspaces": ["apps/*"]
+    "workspaces": [
+        "apps/*"
+    ]
 }
