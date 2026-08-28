@@ -10,7 +10,7 @@ interface Props {
 
 export function LegalLayout({ onBack, title, lastUpdated, children }: Props) {
   return (
-    <div className="min-h-screen bg-[#F9FAFB] text-slate-900 font-sans antialiased flex flex-col">
+    <div className="min-h-screen bg-[#0B161E] text-white font-sans antialiased flex flex-col">
       <header className="sticky top-0 w-full z-50 bg-[#0B161E] border-b border-white/10">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <button 
@@ -30,12 +30,12 @@ export function LegalLayout({ onBack, title, lastUpdated, children }: Props) {
       </header>
 
       <main className="flex-1 max-w-3xl mx-auto w-full px-4 sm:px-6 py-12">
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 sm:p-12">
-          <h1 className="text-3xl font-black text-slate-900 mb-2">{title}</h1>
-          <p className="text-sm text-slate-500 font-medium mb-10 pb-6 border-b border-slate-100">
+        <div className="bg-[#131B27] rounded-2xl shadow-sm border border-white/5 p-8 sm:p-12">
+          <h1 className="text-3xl font-black text-white mb-2">{title}</h1>
+          <p className="text-sm text-white/40 font-medium mb-10 pb-6 border-b border-white/10">
             Last Updated: {lastUpdated}
           </p>
-          <div className="prose prose-slate prose-sm sm:prose-base max-w-none text-slate-600 prose-headings:text-slate-900 prose-a:text-[#0F9D58]">
+          <div className="prose prose-sm sm:prose-base max-w-none prose-invert text-white/70 prose-headings:text-white prose-a:text-[#0F9D58]">
             {children}
           </div>
         </div>
