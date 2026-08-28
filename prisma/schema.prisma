@@ -158,10 +158,38 @@ model Document {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  name      String
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String    @id @default(uuid())
+  name        String
+  email       String    @unique
+  password    String
+  role        String    @default("USER")   // USER | ADMIN
+  plan        String    @default("FREE")   // FREE | PRO | BUSINESS
+  planExpiry  DateTime?
+  trialUsed   Int       @default(0)
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model AdminSettings {
+  id              String   @id @default("global")
+  freeTrialLimit  Int      @default(5)
+  // JSON string: { weekly:{free,pro,business}, monthly:{...}, yearly:{...} }
+  pricingJson     String   @default("{}")
+  // JSON array of doc types that count toward trial e.g. ["Invoice","Quotation","Receipt","Letter"]
+  trialDocTypes   String   @default("[\"Invoice\",\"Quotation\",\"Receipt\",\"Letter\"]")
+  updatedAt       DateTime @updatedAt
+}
+
+model Payment {
+  id          String   @id @default(uuid())
+  userId      String?
+  userName    String
+  userEmail   String
+  plan        String
+  amount      Float
+  currency    String   @default("NGN")
+  status      String   @default("Pending")  // Pending | Confirmed | Failed
+  reference   String?
+  createdAt   DateTime @default(now())
 }

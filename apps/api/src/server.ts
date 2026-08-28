@@ -37,6 +37,18 @@ async function main() {
         });
     }
 
+    if (process.env.ADMIN_EMAIL) {
+        try {
+            await prisma.user.update({
+                where: { email: process.env.ADMIN_EMAIL },
+                data: { role: 'ADMIN' }
+            });
+            console.log(`Promoted ${process.env.ADMIN_EMAIL} to ADMIN`);
+        } catch (e) {
+            // User might not exist yet, ignore
+        }
+    }
+
     // ── Auth Routes ──────────────────────────────────────────────────
 
     // POST /api/auth/signup
@@ -842,6 +854,75 @@ async function main() {
                                                                         return reply.send(htmlContent);
                                                                     }
                                                                 );
+
+    // ── Admin Routes ──────────────────────────────────────────────────
+
+    const isAdmin = async (req: any, reply: any) => {
+        try {
+            await req.jwtVerify();
+            const payload = req.user as { id: string; email: string; name: string };
+            const user = await prisma.user.findUnique({ where: { id: payload.id } });
+            if (!user || user.role !== 'ADMIN') {
+                return reply.status(403).send({ error: 'Forbidden. Admin only.' });
+            }
+            req.adminUser = user;
+        } catch {
+            return reply.status(401).send({ error: 'Unauthorized.' });
+        }
+    };
+
+    app.get('/api/admin/stats', { preValidation: [isAdmin] }, async (req, reply) => {
+        const [totalUsers, activeUsers, proUsers, businessUsers, totalDocuments, recentUsers] = await Promise.all([
+            prisma.user.count(),
+            prisma.user.count({ where: { isActive: true } }),
+            prisma.user.count({ where: { plan: 'PRO' } }),
+            prisma.user.count({ where: { plan: 'BUSINESS' } }),
+            prisma.document.count(),
+            prisma.user.findMany({ orderBy: { createdAt: 'desc' }, take: 8 })
+        ]);
+        return reply.send({ totalUsers, activeUsers, proUsers, businessUsers, totalDocuments, recentUsers });
+    });
+
+    app.get('/api/admin/users', { preValidation: [isAdmin] }, async (req, reply) => {
+        const users = await prisma.user.findMany({ orderBy: { createdAt: 'desc' } });
+        return reply.send(users);
+    });
+
+    app.put('/api/admin/users/:id', { preValidation: [isAdmin] }, async (req: any, reply) => {
+        const id = req.params.id;
+        const data = req.body as any;
+        const user = await prisma.user.update({ where: { id }, data });
+        return reply.send(user);
+    });
+
+    app.delete('/api/admin/users/:id', { preValidation: [isAdmin] }, async (req: any, reply) => {
+        const id = req.params.id;
+        await prisma.user.delete({ where: { id } });
+        return reply.send({ success: true });
+    });
+
+    app.get('/api/admin/payments', { preValidation: [isAdmin] }, async (req, reply) => {
+        const payments = await prisma.payment.findMany({ orderBy: { createdAt: 'desc' } });
+        return reply.send(payments);
+    });
+
+    app.get('/api/admin/settings', { preValidation: [isAdmin] }, async (req, reply) => {
+        let settings = await prisma.adminSettings.findUnique({ where: { id: 'global' } });
+        if (!settings) {
+            settings = await prisma.adminSettings.create({ data: { id: 'global' } });
+        }
+        return reply.send(settings);
+    });
+
+    app.put('/api/admin/settings', { preValidation: [isAdmin] }, async (req: any, reply) => {
+        const data = req.body;
+        const settings = await prisma.adminSettings.upsert({
+            where: { id: 'global' },
+            update: data,
+            create: { id: 'global', ...data }
+        });
+        return reply.send(settings);
+    });
 
                                                                 if (!process.env.VERCEL) {
                                                                     const PORT = process.env.PORT ? parseInt(process.env.PORT) : 5000;

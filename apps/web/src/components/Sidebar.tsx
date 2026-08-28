@@ -15,6 +15,7 @@ import {
   Users,
   CreditCard,
   BadgeCheck,
+  Shield,
 } from 'lucide-react';
 import { Company, User } from '../types';
 
@@ -38,6 +39,13 @@ const navItems = [
   { id: 'subscription',label: 'Subscription',       icon: BadgeCheck },
   { id: 'settings',    label: 'Company Settings',   icon: Settings },
 ];
+
+const getNavItems = (user: User | null) => {
+  if (user?.role === 'ADMIN') {
+    return [...navItems, { id: 'admin', label: 'Admin Panel', icon: Shield }];
+  }
+  return navItems;
+};
 
 export const Sidebar: React.FC<SidebarProps> = ({
   currentView,
@@ -85,7 +93,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* ── Nav Items ────────────────────────────────── */}
       <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
-        {navItems.map(({ id, label, icon: Icon }) => {
+        {getNavItems(user).map(({ id, label, icon: Icon }) => {
           const isActive = currentView === id;
           return (
             <button

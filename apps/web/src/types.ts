@@ -2,6 +2,44 @@ export interface User {
   id: string;
   name: string;
   email: string;
+  role?: string;       // 'USER' | 'ADMIN'
+  plan?: string;       // 'FREE' | 'PRO' | 'BUSINESS'
+  trialUsed?: number;
+  isActive?: boolean;
+  planExpiry?: string | null;
+  createdAt?: string;
+}
+
+export interface AdminUser {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  plan: string;
+  trialUsed: number;
+  isActive: boolean;
+  planExpiry: string | null;
+  createdAt: string;
+}
+
+export interface AdminSettings {
+  id: string;
+  freeTrialLimit: number;
+  pricingJson: string;
+  trialDocTypes: string;
+}
+
+export interface AdminPayment {
+  id: string;
+  userId: string | null;
+  userName: string;
+  userEmail: string;
+  plan: string;
+  amount: number;
+  currency: string;
+  status: string;
+  reference: string | null;
+  createdAt: string;
 }
 
 export interface Company {

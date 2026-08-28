@@ -13,6 +13,7 @@ import { DocumentPreviewModal } from './components/DocumentPreviewModal';
 import { CustomerModule } from './components/CustomerModule';
 import { PaymentModule } from './components/PaymentModule';
 import { SubscriptionModule } from './components/SubscriptionModule';
+import { AdminPanel } from './components/AdminPanel';
 import { LoginPage } from './components/LoginPage';
 import { SignupPage } from './components/SignupPage';
 import { LandingPage } from './components/LandingPage';
@@ -187,6 +188,10 @@ export function App() {
 
   if (setupRequired) {
     return <SetupWizard onComplete={handleSetupComplete} />;
+  }
+
+  if (currentView === 'admin' && user?.role === 'ADMIN') {
+    return <AdminPanel onBack={() => setCurrentView('dashboard')} />;
   }
 
   // ── Main authenticated app layout: Sidebar + Header + Content ─
