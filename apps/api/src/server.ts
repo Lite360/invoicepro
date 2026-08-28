@@ -210,27 +210,42 @@ async function main() {
 
         // 3. Dashboard Statistics
         app.get('/api/dashboard/stats', async (req, reply) => {
-            const [totalInvoices, totalQuotations, totalReceipts, totalLetters, recentDocs] = await Promise.all([
+            const [
+                totalInvoices, 
+                totalQuotations, 
+                totalReceipts, 
+                totalLetters, 
+                recentDocs, 
+                totalCustomers,
+                allInvoices
+            ] = await Promise.all([
                 prisma.invoice.count(),
                 prisma.quotation.count(),
                 prisma.receipt.count(),
                 prisma.letter.count(),
-                prisma.document.findMany(
-                    {
-                        take: 5,
-                        orderBy: {
-                            createdAt: 'desc'
-                        }
-                    }
-                ),
+                prisma.document.findMany({
+                    take: 5,
+                    orderBy: { createdAt: 'desc' }
+                }),
+                prisma.customer.count(),
+                prisma.invoice.findMany({ select: { grandTotal: true, status: true } })
             ]);
+
+            const pendingPaymentsAmount = allInvoices
+                .filter(inv => inv.status !== 'Paid')
+                .reduce((sum, inv) => sum + inv.grandTotal, 0);
+
+            const paidInvoicesCount = allInvoices.filter(inv => inv.status === 'Paid').length;
 
             return reply.send({
                 totalInvoices,
                 totalQuotations,
                 totalReceipts,
                 totalLetters,
-                recentDocs
+                recentDocs,
+                totalCustomers,
+                pendingPaymentsAmount,
+                paidInvoicesCount
             });
         });
 
@@ -274,6 +289,55 @@ async function main() {
                                                 return reply.send({number: num});
                                             }
                                         );
+
+                                        // 3.5 Customers API
+                                        app.get('/api/customers', async (req, reply) => {
+                                            const customers = await prisma.customer.findMany({
+                                                orderBy: { createdAt: 'desc' }
+                                            });
+                                            
+                                            // Calculate total billed for each customer by fetching all their invoices
+                                            const invoices = await prisma.invoice.findMany({ select: { customerName: true, grandTotal: true } });
+                                            
+                                            const customersWithBilled = customers.map(c => {
+                                                const totalBilled = invoices
+                                                    .filter(inv => inv.customerName === c.name)
+                                                    .reduce((sum, inv) => sum + inv.grandTotal, 0);
+                                                return { ...c, totalBilled };
+                                            });
+
+                                            return reply.send(customersWithBilled);
+                                        });
+
+                                        app.post('/api/customers', async (req, reply) => {
+                                            const { name, email, phone, address } = req.body as any;
+                                            if (!name) return reply.status(400).send({ error: 'Customer name is required' });
+
+                                            const customer = await prisma.customer.create({
+                                                data: { name, email, phone, address }
+                                            });
+                                            return reply.send(customer);
+                                        });
+
+                                        // 3.6 Payments API
+                                        app.get('/api/payments', async (req, reply) => {
+                                            const invoices = await prisma.invoice.findMany({
+                                                orderBy: { createdAt: 'desc' }
+                                            });
+                                            
+                                            // Map invoices to Payment format
+                                            const payments = invoices.map(inv => ({
+                                                id: inv.id,
+                                                invoiceId: inv.number,
+                                                customer: inv.customerName,
+                                                amount: inv.grandTotal,
+                                                status: inv.status === 'Paid' ? 'paid' : 'pending',
+                                                date: inv.date,
+                                                dueDate: inv.dueDate
+                                            }));
+
+                                            return reply.send(payments);
+                                        });
 
                                         // 4. Invoices API
                                         app.get('/api/invoices', async (req, reply) => {

@@ -114,7 +114,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
               <Clock className="w-6 h-6 text-amber-500" />
             </div>
             <div>
-              <div className="text-2xl font-bold text-slate-900">{company?.currency || 'NGN'} 0.00</div>
+              <div className="text-2xl font-bold text-slate-900">{company?.currency || 'NGN'} {(stats as any).pendingPaymentsAmount?.toLocaleString() || '0'}</div>
               <div className="text-xs text-slate-500">Pending Payments</div>
             </div>
           </div>
@@ -124,7 +124,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
               <Building2 className="w-6 h-6 text-purple-600" />
             </div>
             <div>
-              <div className="text-2xl font-bold text-slate-900">3</div>
+              <div className="text-2xl font-bold text-slate-900">{(stats as any).totalCustomers || 0}</div>
               <div className="text-xs text-slate-500">Total Customers</div>
             </div>
           </div>

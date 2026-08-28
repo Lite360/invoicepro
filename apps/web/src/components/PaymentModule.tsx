@@ -8,13 +8,24 @@ interface PaymentModuleProps {
 
 export const PaymentModule: React.FC<PaymentModuleProps> = ({ company }) => {
   const [filter, setFilter] = useState<'all' | 'paid' | 'pending'>('all');
+  const [payments, setPayments] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const payments = [
-    { id: '1', invoiceId: 'INV-2026-001', customer: 'Acme Corp', amount: 4500, status: 'paid', date: 'Aug 24, 2026' },
-    { id: '2', invoiceId: 'INV-2026-002', customer: 'Globex Inc', amount: 2100, status: 'pending', date: 'Aug 25, 2026', dueDate: 'Sep 01, 2026' },
-    { id: '3', invoiceId: 'INV-2026-003', customer: 'Initech', amount: 1850, status: 'paid', date: 'Aug 27, 2026' },
-    { id: '4', invoiceId: 'INV-2026-004', customer: 'Stark Industries', amount: 6200, status: 'pending', date: 'Aug 28, 2026', dueDate: 'Sep 05, 2026' },
-  ];
+  useEffect(() => {
+    fetchPayments();
+  }, []);
+
+  const fetchPayments = async () => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/payments`);
+      const data = await res.json();
+      setPayments(data);
+    } catch (error) {
+      console.error('Failed to fetch payments', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const filteredPayments = filter === 'all' ? payments : payments.filter(p => p.status === filter);
   
@@ -78,7 +89,15 @@ export const PaymentModule: React.FC<PaymentModuleProps> = ({ company }) => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {filteredPayments.map((p) => (
+              {isLoading ? (
+                <tr>
+                  <td colSpan={5} className="p-8 text-center text-slate-500">Loading payments...</td>
+                </tr>
+              ) : filteredPayments.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="p-8 text-center text-slate-500">No payments found matching this filter.</td>
+                </tr>
+              ) : filteredPayments.map((p) => (
                 <tr key={p.id} className="hover:bg-slate-50 transition group cursor-pointer">
                   <td className="p-4 font-bold text-slate-900">{p.invoiceId}</td>
                   <td className="p-4 text-slate-700 font-medium">{p.customer}</td>

@@ -9,13 +9,49 @@ interface CustomerModuleProps {
 export const CustomerModule: React.FC<CustomerModuleProps> = ({ company }) => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [customers, setCustomers] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Placeholder data for UI
-  const customers = [
-    { id: '1', name: 'Acme Corp', email: 'billing@acmecorp.com', phone: '+1 234 567 8900', address: '123 Business Rd, NY', totalBilled: 12500 },
-    { id: '2', name: 'Globex Inc', email: 'finance@globex.com', phone: '+1 987 654 3210', address: '456 Tech Park, CA', totalBilled: 8400 },
-    { id: '3', name: 'Initech', email: 'accounts@initech.com', phone: '+1 555 123 4567', address: '789 Office Park, TX', totalBilled: 3200 },
-  ];
+  // Form State
+  const [formData, setFormData] = useState({ name: '', email: '', phone: '', address: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    fetchCustomers();
+  }, []);
+
+  const fetchCustomers = async () => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/customers`);
+      const data = await res.json();
+      setCustomers(data);
+    } catch (error) {
+      console.error('Failed to fetch customers', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!formData.name) return alert('Name is required');
+    setIsSubmitting(true);
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/customers`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+      if (res.ok) {
+        setShowAddModal(false);
+        setFormData({ name: '', email: '', phone: '', address: '' });
+        fetchCustomers();
+      }
+    } catch (error) {
+      console.error('Failed to create customer', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
@@ -55,20 +91,28 @@ export const CustomerModule: React.FC<CustomerModuleProps> = ({ company }) => {
       </div>
 
       {/* Customer List */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {customers.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase())).map((customer) => (
-          <div key={customer.id} className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition group">
-            <div className="flex justify-between items-start mb-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-[#0F9D58]/10 text-[#0F9D58] flex items-center justify-center font-bold text-lg">
-                  {customer.name.charAt(0)}
-                </div>
-                <div>
-                  <h3 className="font-bold text-slate-900">{customer.name}</h3>
-                  <p className="text-xs font-semibold text-[#0F9D58]">
-                    Total Billed: {company?.currency || '$'}{customer.totalBilled.toLocaleString()}
-                  </p>
-                </div>
+      {isLoading ? (
+        <div className="text-center py-12 text-slate-500">Loading customers...</div>
+      ) : customers.length === 0 ? (
+        <div className="text-center py-12 bg-slate-50 rounded-2xl border border-slate-200">
+          <p className="text-slate-500 mb-4">No customers found. Add your first customer!</p>
+          <button onClick={() => setShowAddModal(true)} className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium rounded-xl transition">Add Customer</button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {customers.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase())).map((customer) => (
+            <div key={customer.id} className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition group">
+              <div className="flex justify-between items-start mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-[#0F9D58]/10 text-[#0F9D58] flex items-center justify-center font-bold text-lg uppercase">
+                    {customer.name.charAt(0)}
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-slate-900 truncate w-32 sm:w-40">{customer.name}</h3>
+                    <p className="text-xs font-semibold text-[#0F9D58]">
+                      Total Billed: {company?.currency || '$'}{(customer.totalBilled || 0).toLocaleString()}
+                    </p>
+                  </div>
               </div>
               <button className="text-slate-400 hover:text-slate-600">
                 <MoreVertical className="w-4 h-4" />
@@ -103,25 +147,27 @@ export const CustomerModule: React.FC<CustomerModuleProps> = ({ company }) => {
             <div className="space-y-4">
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">Company / Name *</label>
-                <input type="text" className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#0F9D58] focus:border-transparent outline-none" placeholder="e.g. Acme Corp" />
+                <input value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} type="text" className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#0F9D58] focus:border-transparent outline-none" placeholder="e.g. Acme Corp" />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Email Address *</label>
-                <input type="email" className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#0F9D58] focus:border-transparent outline-none" placeholder="billing@company.com" />
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Email Address</label>
+                <input value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} type="email" className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#0F9D58] focus:border-transparent outline-none" placeholder="billing@company.com" />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">Phone Number</label>
-                <input type="tel" className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#0F9D58] focus:border-transparent outline-none" placeholder="+1 (555) 000-0000" />
+                <input value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} type="tel" className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#0F9D58] focus:border-transparent outline-none" placeholder="+1 (555) 000-0000" />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">Billing Address</label>
-                <textarea rows={2} className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#0F9D58] focus:border-transparent outline-none resize-none" placeholder="Full address"></textarea>
+                <textarea value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} rows={2} className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#0F9D58] focus:border-transparent outline-none resize-none" placeholder="Full address"></textarea>
               </div>
             </div>
 
             <div className="flex gap-3 mt-8">
-              <button onClick={() => setShowAddModal(false)} className="flex-1 py-2.5 rounded-xl font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 transition">Cancel</button>
-              <button onClick={() => setShowAddModal(false)} className="flex-1 py-2.5 rounded-xl font-semibold text-white bg-[#0F9D58] hover:bg-[#0B7A44] shadow-md shadow-[#0F9D58]/20 transition">Save Customer</button>
+              <button disabled={isSubmitting} onClick={() => setShowAddModal(false)} className="flex-1 py-2.5 rounded-xl font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 transition">Cancel</button>
+              <button disabled={isSubmitting} onClick={handleSubmit} className="flex-1 py-2.5 rounded-xl font-semibold text-white bg-[#0F9D58] hover:bg-[#0B7A44] shadow-md shadow-[#0F9D58]/20 transition">
+                {isSubmitting ? 'Saving...' : 'Save Customer'}
+              </button>
             </div>
           </div>
         </div>
