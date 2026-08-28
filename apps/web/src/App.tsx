@@ -11,14 +11,15 @@ import { DocumentHistory } from './components/DocumentHistory';
 import { DocumentPreviewModal } from './components/DocumentPreviewModal';
 import { LoginPage } from './components/LoginPage';
 import { SignupPage } from './components/SignupPage';
+import { LandingPage } from './components/LandingPage';
 import { Company, User } from './types';
 
-type AuthView = 'login' | 'signup';
+type PageView = 'landing' | 'login' | 'signup';
 
 export function App() {
   const [user, setUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
-  const [authView, setAuthView] = useState<AuthView>('login');
+  const [pageView, setPageView] = useState<PageView>('landing');
 
   const [company, setCompany] = useState<Company | null>(null);
   const [setupRequired, setSetupRequired] = useState<boolean | null>(null);
@@ -83,7 +84,7 @@ export function App() {
     setCompany(null);
     setSetupRequired(null);
     setCurrentView('dashboard');
-    setAuthView('login');
+    setPageView('landing');
   };
 
   const handleSetupComplete = (newCompany: Company) => {
@@ -101,35 +102,51 @@ export function App() {
   // ── Auth loading spinner ──────────────────────────────────────
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center text-white">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-10 h-10 rounded-xl bg-[#CAFF33] flex items-center justify-center">
+            <svg className="w-5 h-5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </div>
+          <div className="animate-spin rounded-full h-6 w-6 border-2 border-[#CAFF33]/20 border-t-[#CAFF33]"></div>
+        </div>
       </div>
     );
   }
 
-  // ── Not authenticated: show Login or Signup ───────────────────
+  // ── Not authenticated ─────────────────────────────────────────
   if (!user) {
-    if (authView === 'signup') {
+    if (pageView === 'signup') {
       return (
         <SignupPage
           onSignupSuccess={handleAuthSuccess}
-          onGoToLogin={() => setAuthView('login')}
+          onGoToLogin={() => setPageView('login')}
         />
       );
     }
+    if (pageView === 'login') {
+      return (
+        <LoginPage
+          onLoginSuccess={handleAuthSuccess}
+          onGoToSignup={() => setPageView('signup')}
+        />
+      );
+    }
+    // Default: show landing page
     return (
-      <LoginPage
-        onLoginSuccess={handleAuthSuccess}
-        onGoToSignup={() => setAuthView('signup')}
+      <LandingPage
+        onGetStarted={() => setPageView('signup')}
+        onSignIn={() => setPageView('login')}
       />
     );
   }
 
-  // ── Authenticated: company setup check spinner ────────────────
+  // ── Authenticated: company setup check ───────────────────────
   if (setupRequired === null) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center text-white">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#CAFF33]/20 border-t-[#CAFF33]"></div>
       </div>
     );
   }
