@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Navbar } from './components/Navbar';
+import { Sidebar } from './components/Sidebar';
+import { AppHeader } from './components/AppHeader';
 import { SetupWizard } from './components/SetupWizard';
 import { Dashboard } from './components/Dashboard';
 import { CompanySettings } from './components/CompanySettings';
@@ -109,7 +110,7 @@ export function App() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
           </div>
-          <div className="animate-spin rounded-full h-6 w-6 border-2 border-[#CAFF33]/20 border-t-[#CAFF33]"></div>
+          <div className="animate-spin rounded-full h-6 w-6 border-2 border-[#CAFF33]/20 border-t-[#CAFF33]" />
         </div>
       </div>
     );
@@ -133,7 +134,6 @@ export function App() {
         />
       );
     }
-    // Default: show landing page
     return (
       <LandingPage
         onGetStarted={() => setPageView('signup')}
@@ -145,8 +145,8 @@ export function App() {
   // ── Authenticated: company setup check ───────────────────────
   if (setupRequired === null) {
     return (
-      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#CAFF33]/20 border-t-[#CAFF33]"></div>
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#CAFF33]/30 border-t-[#CAFF33]" />
       </div>
     );
   }
@@ -155,9 +155,11 @@ export function App() {
     return <SetupWizard onComplete={handleSetupComplete} />;
   }
 
+  // ── Main authenticated app layout: Sidebar + Header + Content ─
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
-      <Navbar
+    <div className="min-h-screen bg-slate-50 flex font-sans">
+      {/* Fixed left sidebar */}
+      <Sidebar
         currentView={currentView}
         setCurrentView={setCurrentView}
         company={company}
@@ -165,39 +167,51 @@ export function App() {
         onLogout={handleLogout}
       />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {currentView === 'dashboard' && (
-          <Dashboard
-            setCurrentView={setCurrentView}
-            company={company}
-            onSelectDocumentForPreview={handleOpenPreview}
-          />
-        )}
-        {currentView === 'invoices' && (
-          <InvoiceModule company={company} onPreview={handleOpenPreview} />
-        )}
-        {currentView === 'quotations' && (
-          <QuotationModule
-            company={company}
-            onPreview={handleOpenPreview}
-            onInvoiceCreated={() => setCurrentView('invoices')}
-          />
-        )}
-        {currentView === 'receipts' && (
-          <ReceiptModule company={company} onPreview={handleOpenPreview} />
-        )}
-        {currentView === 'letters' && (
-          <LetterModule company={company} onPreview={handleOpenPreview} />
-        )}
-        {currentView === 'history' && (
-          <DocumentHistory company={company} onSelectDocumentForPreview={handleOpenPreview} />
-        )}
-        {currentView === 'settings' && (
-          <CompanySettings company={company} onUpdateCompany={handleSetupComplete} />
-        )}
-      </main>
+      {/* Right-side column: header + scrollable content */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Sticky top header */}
+        <AppHeader
+          currentView={currentView}
+          setCurrentView={setCurrentView}
+          company={company}
+          user={user}
+        />
 
-      {/* Global Document A4 Live Preview Modal */}
+        {/* Scrollable main content */}
+        <main className="flex-1 px-4 sm:px-6 lg:px-8 py-6 overflow-auto">
+          {currentView === 'dashboard' && (
+            <Dashboard
+              setCurrentView={setCurrentView}
+              company={company}
+              onSelectDocumentForPreview={handleOpenPreview}
+            />
+          )}
+          {currentView === 'invoices' && (
+            <InvoiceModule company={company} onPreview={handleOpenPreview} />
+          )}
+          {currentView === 'quotations' && (
+            <QuotationModule
+              company={company}
+              onPreview={handleOpenPreview}
+              onInvoiceCreated={() => setCurrentView('invoices')}
+            />
+          )}
+          {currentView === 'receipts' && (
+            <ReceiptModule company={company} onPreview={handleOpenPreview} />
+          )}
+          {currentView === 'letters' && (
+            <LetterModule company={company} onPreview={handleOpenPreview} />
+          )}
+          {currentView === 'history' && (
+            <DocumentHistory company={company} onSelectDocumentForPreview={handleOpenPreview} />
+          )}
+          {currentView === 'settings' && (
+            <CompanySettings company={company} onUpdateCompany={handleSetupComplete} />
+          )}
+        </main>
+      </div>
+
+      {/* Global Document Preview Modal */}
       <DocumentPreviewModal
         isOpen={previewModalOpen}
         onClose={() => setPreviewModalOpen(false)}
