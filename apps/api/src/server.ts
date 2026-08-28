@@ -37,19 +37,7 @@ async function main() {
         });
     }
 
-    if (process.env.ADMIN_EMAIL) {
-        (async () => {
-            try {
-                await (prisma.user as any).update({
-                    where: { email: process.env.ADMIN_EMAIL },
-                    data: { role: 'ADMIN' }
-                });
-                console.log(`Promoted ${process.env.ADMIN_EMAIL} to ADMIN`);
-            } catch (e) {
-                // User might not exist yet, ignore
-            }
-        })();
-    }
+
 
     // ── Auth Routes ──────────────────────────────────────────────────
 
@@ -78,11 +66,17 @@ async function main() {
         }
 
         const hashed = await bcrypt.hash(password, 12);
+        let role = 'USER';
+        if (process.env.ADMIN_EMAIL && email === process.env.ADMIN_EMAIL) {
+            role = 'ADMIN';
+        }
+
         const user = await prisma.user.create({
             data: {
                 name,
                 email,
-                password: hashed
+                password: hashed,
+                ...(role === 'ADMIN' ? { role: 'ADMIN' } : {})
             }
         });
 
@@ -158,7 +152,7 @@ async function main() {
             return reply.status(400).send({ error: 'Email and password are required.' });
         }
 
-        const user = await prisma.user.findUnique({
+        let user = await prisma.user.findUnique({
             where: {
                 email
             }
@@ -172,11 +166,20 @@ async function main() {
             return reply.status(401).send({ error: 'Invalid email or password.' });
         }
 
+        // Auto-promote if email matches ADMIN_EMAIL
+        if (process.env.ADMIN_EMAIL && user.email === process.env.ADMIN_EMAIL && (user as any).role !== 'ADMIN') {
+            user = await (prisma.user as any).update({
+                where: { id: user.id },
+                data: { role: 'ADMIN' }
+            });
+        }
+
         const token = app.jwt.sign({
             id: user.id,
             email: user.email,
             name: user.name
         }, { expiresIn: '7d' });
+        
         return reply.send({
             token,
             user: {
@@ -204,6 +207,15 @@ async function main() {
             });
             if (!user)
                 return reply.status(404).send({ error: 'User not found.' });
+            
+            // Auto-promote if email matches ADMIN_EMAIL
+            if (process.env.ADMIN_EMAIL && user.email === process.env.ADMIN_EMAIL && (user as any).role !== 'ADMIN') {
+                user = await (prisma.user as any).update({
+                    where: { id: user.id },
+                    data: { role: 'ADMIN' }
+                });
+            }
+
             return reply.send({ id: user.id, name: user.name, email: user.email, role: (user as any).role || 'USER' });
         } catch {
             return reply.status(401).send(
