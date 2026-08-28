@@ -10,7 +10,7 @@
         "postinstall": "npx prisma generate",
         "build": "npm run build:web && npm run build:api",
         "build:web": "npm run build --prefix apps/web",
-        "build:api": "tsc -p apps/api/tsconfig.json"
+        "build:api": "npm run compile --prefix apps/api"
     },
     "devDependencies": {
         "@prisma/client": "^5.14.0",
