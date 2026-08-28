@@ -175,17 +175,17 @@ async function main() {
         }
 
         const token = app.jwt.sign({
-            id: user.id,
-            email: user.email,
-            name: user.name
+            id: user!.id,
+            email: user!.email,
+            name: user!.name
         }, { expiresIn: '7d' });
         
         return reply.send({
             token,
             user: {
-                id: user.id,
-                name: user.name,
-                email: user.email,
+                id: user!.id,
+                name: user!.name,
+                email: user!.email,
                 role: (user as any).role || 'USER'
             }
         });
@@ -200,7 +200,7 @@ async function main() {
                 email: string;
                 name: string
             };
-            const user = await prisma.user.findUnique({
+            let user = await prisma.user.findUnique({
                 where: {
                     id: payload.id
                 }
@@ -216,7 +216,7 @@ async function main() {
                 });
             }
 
-            return reply.send({ id: user.id, name: user.name, email: user.email, role: (user as any).role || 'USER' });
+            return reply.send({ id: user!.id, name: user!.name, email: user!.email, role: (user as any).role || 'USER' });
         } catch {
             return reply.status(401).send(
                 { error: 'Unauthorized.' }
