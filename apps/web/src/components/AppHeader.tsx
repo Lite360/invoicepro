@@ -47,7 +47,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
           <button
             id="header-new-doc-btn"
             onClick={() => setCurrentView('invoices')}
-            className="flex items-center gap-1.5 bg-[#CAFF33] hover:bg-[#d4ff55] text-black text-xs font-bold px-3 py-2 rounded-lg transition-all hover:shadow-md hover:shadow-[#CAFF33]/20"
+            className="flex items-center gap-1.5 bg-[#0F9D58] hover:bg-[#0B7A44] text-white text-xs font-bold px-3 py-2 rounded-lg transition-all hover:shadow-md hover:shadow-[#0F9D58]/20"
           >
             <Plus className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">New Document</span>
@@ -61,7 +61,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
           >
             <Bell className="w-4 h-4" />
             {/* Unread dot */}
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#CAFF33] rounded-full border-2 border-white" />
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#0F9D58] rounded-full border-2 border-white" />
           </button>
 
           {/* User avatar */}
@@ -70,7 +70,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
             onClick={() => setCurrentView('settings')}
             title="Company settings"
           >
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-xs font-bold text-white flex-shrink-0 ring-2 ring-transparent group-hover:ring-[#CAFF33]/50 transition-all">
+            <div className="w-8 h-8 rounded-full bg-[#0F9D58] flex items-center justify-center text-xs font-bold text-white flex-shrink-0 ring-2 ring-transparent group-hover:ring-[#0F9D58]/30 transition-all">
               {initials}
             </div>
             <div className="hidden md:block min-w-0">
