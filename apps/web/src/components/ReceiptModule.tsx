@@ -43,7 +43,10 @@ export const ReceiptModule: React.FC<ReceiptModuleProps> = ({ company, onPreview
     try {
       const res = await fetch('/api/receipts', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('invoicepro_token')}`
+        },
         body: JSON.stringify({ ...formData, status }),
       });
       const data = await res.json();

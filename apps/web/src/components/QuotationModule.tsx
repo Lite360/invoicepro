@@ -97,7 +97,10 @@ export const QuotationModule: React.FC<QuotationModuleProps> = ({
     try {
       const res = await fetch('/api/quotations', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('invoicepro_token')}`
+        },
         body: JSON.stringify({ ...formData, status }),
       });
       const data = await res.json();
@@ -116,19 +119,32 @@ export const QuotationModule: React.FC<QuotationModuleProps> = ({
       // First save quotation then convert
       const res = await fetch('/api/quotations', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('invoicepro_token')}`
+        },
         body: JSON.stringify(formData),
       });
       const data = await res.json();
       if (data.id) {
-        const convRes = await fetch(`/api/quotations/${data.id}/convert`, { method: 'POST' });
+        const convRes = await fetch(`/api/quotations/${data.id}/convert`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('invoicepro_token')}`
+          }
+        });
         const convData = await convRes.json();
         if (convData.invoice) {
           onInvoiceCreated();
         }
       }
     } else {
-      const convRes = await fetch(`/api/quotations/${formData.id}/convert`, { method: 'POST' });
+      const convRes = await fetch(`/api/quotations/${formData.id}/convert`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('invoicepro_token')}`
+        }
+      });
       const convData = await convRes.json();
       if (convData.invoice) {
         onInvoiceCreated();
