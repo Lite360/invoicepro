@@ -3,8 +3,8 @@ const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/icon-192x192.jpg',
-  '/icon-512x512.jpg',
+  '/icon-192x192.png',
+  '/icon-512x512.png',
 ];
 
 // Install: cache core shell
