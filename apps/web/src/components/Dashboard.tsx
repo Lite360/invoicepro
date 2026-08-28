@@ -64,7 +64,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         <div>
           <div className="flex items-center space-x-2 text-xs font-semibold text-blue-400 uppercase tracking-widest mb-2">
             <Building2 className="w-4 h-4" />
-            <span>{company?.companyName || 'BrandDocs Dashboard'}</span>
+            <span>{company?.companyName || 'Invoicepro Dashboard'}</span>
           </div>
           <h1 className="text-3xl font-extrabold tracking-tight">Overview & Document Hub</h1>
           <p className="text-slate-400 text-sm mt-1 max-w-xl">

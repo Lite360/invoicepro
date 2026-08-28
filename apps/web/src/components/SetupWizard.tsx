@@ -86,9 +86,9 @@ export const SetupWizard: React.FC<SetupWizardProps> = ({ onComplete, existingCo
               <Sparkles className="w-3.5 h-3.5 text-yellow-300" />
               <span>First Launch Setup Wizard</span>
             </div>
-            <h1 className="text-3xl font-extrabold tracking-tight">Welcome to BrandDocs</h1>
+            <h1 className="text-3xl font-extrabold tracking-tight">Welcome to Invoicepro</h1>
             <p className="text-blue-100 text-sm mt-2 max-w-xl">
-              Configure your business profile once. BrandDocs will automatically format and brand all your invoices, quotations, receipts, and official letters.
+              Configure your business profile once. Invoicepro will automatically format and brand all your invoices, quotations, receipts, and official letters.
             </p>
           </div>
         </div>
@@ -407,7 +407,7 @@ export const SetupWizard: React.FC<SetupWizardProps> = ({ onComplete, existingCo
               className="flex items-center space-x-2 px-8 py-3.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-500 hover:to-indigo-600 text-white font-bold rounded-xl shadow-xl shadow-blue-600/30 transition-all text-sm"
             >
               <CheckCircle2 className="w-5 h-5" />
-              <span>{loading ? 'Saving Profile...' : 'Save & Launch BrandDocs'}</span>
+              <span>{loading ? 'Saving Profile...' : 'Save & Launch Invoicepro'}</span>
             </button>
           </div>
         </form>
