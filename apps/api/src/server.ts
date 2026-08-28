@@ -179,7 +179,14 @@ async function main() {
 
         // 2. File Upload (Logo, Watermark, Signature)
         app.post('/api/upload', async (req, reply) => {
-            const data = await req.file();
+            let data;
+            try {
+                data = await req.file();
+            } catch (err: any) {
+                console.error('Multipart parsing failed:', err);
+                return reply.status(500).send({error: 'Multipart parsing failed', details: err.message});
+            }
+
             if (! data) {
                 return reply.status(400).send({error: 'No file uploaded'});
             }
@@ -195,9 +202,9 @@ async function main() {
                 // Use Vercel Blob for storage
                 const blob = await put(fileName, buffer, {access: 'public'});
                 return reply.send({success: true, url: blob.url});
-            } catch (error) {
+            } catch (error: any) {
                 console.error('Vercel Blob upload failed:', error);
-                return reply.status(500).send({error: 'Upload failed. Check BLOB_READ_WRITE_TOKEN.'});
+                return reply.status(500).send({error: 'Upload failed. Check BLOB_READ_WRITE_TOKEN.', details: error.message});
             }
         });
 
@@ -790,6 +797,13 @@ async function main() {
                                                             main();
 
                                                             export default async function handler (req : any, res : any) {
-                                                                await app.ready();
-                                                                app.server.emit('request', req, res);
-                                                            }
+    await app.ready();
+    app.server.emit('request', req, res);
+}
+
+// Disable Vercel's default body parser so fastify-multipart can read the raw stream
+export const config = {
+    api: {
+        bodyParser: false,
+    },
+};
