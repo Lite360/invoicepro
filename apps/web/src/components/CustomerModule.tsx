@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Users, Plus, Search, Mail, Phone, MapPin, MoreVertical } from 'lucide-react';
 import { Company } from '../types';
 
@@ -136,6 +136,7 @@ export const CustomerModule: React.FC<CustomerModuleProps> = ({ company }) => {
           </div>
         ))}
       </div>
+      )}
 
       {/* Add Customer Modal Placeholder */}
       {showAddModal && (

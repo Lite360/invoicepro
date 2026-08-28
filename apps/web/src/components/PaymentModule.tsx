@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CreditCard, Search, ArrowUpRight, ArrowDownRight, Clock, CheckCircle2 } from 'lucide-react';
 import { Company } from '../types';
 
