@@ -23,9 +23,10 @@ import {
 interface LandingPageProps {
   onGetStarted: () => void;
   onSignIn: () => void;
+  onNavigate?: (view: string) => void;
 }
 
-export function LandingPage({ onGetStarted, onSignIn }: LandingPageProps) {
+export function LandingPage({ onGetStarted, onSignIn, onNavigate }: LandingPageProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const features = [
@@ -338,9 +339,9 @@ export function LandingPage({ onGetStarted, onSignIn }: LandingPageProps) {
       </section>
 
       {/* ── FOOTER ─────────────────────────────────────────── */}
-      <footer className="bg-[#0B161E] py-10 px-4 border-t border-white/10">
+      <footer className="bg-[#0B161E] py-12 px-4 border-t border-white/10">
         <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
             {/* Logo */}
             <div className="flex items-center gap-2">
               <div className="w-6 h-6 rounded bg-[#0F9D58] flex items-center justify-center">
@@ -350,20 +351,23 @@ export function LandingPage({ onGetStarted, onSignIn }: LandingPageProps) {
               <span className="text-white/40 text-xs ml-2">— Create. Send. Get Paid.</span>
             </div>
             {/* Links */}
-            <div className="flex items-center gap-6 text-xs font-medium text-white/50">
-              {['Pricing', 'Sign In', 'Sign Up'].map(link => (
-                <button 
-                  key={link} 
-                  onClick={link === 'Sign In' ? onSignIn : link === 'Sign Up' ? onGetStarted : undefined}
-                  className="hover:text-white transition-colors"
-                >
-                  {link}
-                </button>
-              ))}
+            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs font-medium text-white/50">
+              <button onClick={onSignIn} className="hover:text-white transition-colors">Sign In</button>
+              <button onClick={onGetStarted} className="hover:text-white transition-colors">Sign Up</button>
+              <button onClick={() => onNavigate?.('privacy')} className="hover:text-white transition-colors">Privacy</button>
+              <button onClick={() => onNavigate?.('terms')} className="hover:text-white transition-colors">Terms</button>
+              <button onClick={() => onNavigate?.('aml-kyc')} className="hover:text-white transition-colors">AML & KYC</button>
+              <button onClick={() => onNavigate?.('refund-policy')} className="hover:text-white transition-colors">Refund Policy</button>
             </div>
+          </div>
+          <div className="flex flex-col md:flex-row items-center justify-between pt-8 border-t border-white/5 gap-4">
             {/* Copyright */}
             <p className="text-xs font-medium text-white/30">
               &copy; {new Date().getFullYear()} InvoicePro. All rights reserved.
+            </p>
+            {/* Developer Attribution */}
+            <p className="text-xs font-medium text-white/30">
+              Developed by <a href="https://wa.me/2349054256786" target="_blank" rel="noopener noreferrer" className="text-[#0F9D58] hover:underline">Elite developer</a>
             </p>
           </div>
         </div>
