@@ -8,6 +8,7 @@ import {
   History,
   CheckCircle2,
   ArrowRight,
+  Sparkles,
   Shield,
   Zap,
   Star,
