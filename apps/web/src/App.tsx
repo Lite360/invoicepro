@@ -215,6 +215,7 @@ export function App() {
               setCurrentView={setCurrentView}
               company={company}
               onSelectDocumentForPreview={handleOpenPreview}
+              user={user}
             />
           )}
           {currentView === 'invoices' && (

@@ -12,18 +12,20 @@ import {
   TrendingUp,
   Building2,
 } from 'lucide-react';
-import { Company, DocumentRecord } from '../types';
+import { Company, DocumentRecord, User } from '../types';
 
 interface DashboardProps {
   setCurrentView: (view: string) => void;
   company: Company | null;
   onSelectDocumentForPreview: (type: 'Invoice' | 'Quotation' | 'Receipt' | 'Letter', data: any) => void;
+  user: User | null;
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({
   setCurrentView,
   company,
   onSelectDocumentForPreview,
+  user,
 }) => {
   const [stats, setStats] = useState({
     totalInvoices: 0,
