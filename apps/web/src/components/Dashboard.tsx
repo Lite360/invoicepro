@@ -60,124 +60,108 @@ export const Dashboard: React.FC<DashboardProps> = ({
   return (
     <div className="space-y-8">
       {/* Welcome Header */}
-      <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-3xl p-8 text-white border border-slate-800 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-        <div>
-          <div className="flex items-center space-x-2 text-xs font-semibold text-blue-400 uppercase tracking-widest mb-2">
-            <Building2 className="w-4 h-4" />
-            <span>{company?.companyName || 'Invoicepro Dashboard'}</span>
+      <div className="bg-[#104332] rounded-3xl p-8 text-white shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
+        {/* Decorative faint chart graphic */}
+        <div className="absolute right-0 top-0 bottom-0 w-64 opacity-20 pointer-events-none flex items-center justify-end pr-8">
+          <div className="flex items-end space-x-2 h-24">
+            <div className="w-6 bg-white rounded-t-sm h-12"></div>
+            <div className="w-6 bg-white rounded-t-sm h-8"></div>
+            <div className="w-6 bg-white rounded-t-sm h-16"></div>
+            <div className="w-6 bg-white rounded-t-sm h-20"></div>
           </div>
-          <h1 className="text-3xl font-extrabold tracking-tight">Overview & Document Hub</h1>
-          <p className="text-slate-400 text-sm mt-1 max-w-xl">
-            Quickly create branded invoices, quotations, receipts, and official letters for your business.
-          </p>
         </div>
-        <div className="flex flex-wrap gap-3">
-          <button
-            onClick={() => setCurrentView('invoices')}
-            className="flex items-center space-x-2 px-5 py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm rounded-xl shadow-lg shadow-blue-600/30 transition"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Create Invoice</span>
-          </button>
-          <button
-            onClick={() => setCurrentView('settings')}
-            className="flex items-center space-x-2 px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-sm rounded-xl border border-slate-700 transition"
-          >
-            <Settings className="w-4 h-4" />
-            <span>Brand Settings</span>
-          </button>
+
+        <div className="relative z-10">
+          <div className="flex items-center space-x-2 text-sm text-green-100 mb-1">
+            <span>Good afternoon 👋</span>
+          </div>
+          <h1 className="text-4xl font-extrabold tracking-tight mb-2">{user?.name ? user.name.split(' ')[0] : 'there'}!</h1>
+          <p className="text-green-50 text-sm">
+            Here's an overview of your business activity.
+          </p>
         </div>
       </div>
 
       {/* Overview Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {cards.map((card, idx) => {
-          const Icon = card.icon;
-          return (
-            <div
-              key={idx}
-              onClick={() => setCurrentView(card.view)}
-              className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80 hover:shadow-md transition cursor-pointer group"
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">{card.title}</span>
-                <div className={`p-3 rounded-xl bg-gradient-to-br ${card.color} text-white shadow-md group-hover:scale-110 transition-transform`}>
-                  <Icon className="w-5 h-5" />
-                </div>
-              </div>
-              <div className="mt-4 flex items-baseline justify-between">
-                <span className="text-3xl font-extrabold text-slate-900">{card.count}</span>
-                <span className="text-xs text-blue-600 font-semibold flex items-center group-hover:translate-x-1 transition-transform">
-                  View <ArrowRight className="w-3 h-3 ml-1" />
-                </span>
-              </div>
+      <div>
+        <h2 className="text-base font-bold text-slate-800 mb-4 px-1">Overview</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Card 1 */}
+          <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 flex items-center space-x-4">
+            <div className="p-3 bg-blue-50/50 rounded-xl">
+              <FileSpreadsheet className="w-6 h-6 text-slate-300" />
             </div>
-          );
-        })}
+            <div>
+              <div className="text-2xl font-bold text-slate-900">{stats.totalInvoices}</div>
+              <div className="text-xs text-slate-500">Total Invoices</div>
+            </div>
+          </div>
+          {/* Card 2 */}
+          <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 flex items-center space-x-4">
+            <div className="p-3 bg-green-50 rounded-xl">
+              <FileCheck className="w-6 h-6 text-green-500" />
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-slate-900">0</div>
+              <div className="text-xs text-slate-500">Paid Invoices</div>
+            </div>
+          </div>
+          {/* Card 3 */}
+          <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 flex items-center space-x-4">
+            <div className="p-3 bg-amber-50 rounded-xl">
+              <Clock className="w-6 h-6 text-amber-500" />
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-slate-900">{company?.currency || 'NGN'} 0.00</div>
+              <div className="text-xs text-slate-500">Pending Payments</div>
+            </div>
+          </div>
+          {/* Card 4 */}
+          <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 flex items-center space-x-4">
+            <div className="p-3 bg-purple-50 rounded-xl">
+              <Building2 className="w-6 h-6 text-purple-600" />
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-slate-900">0</div>
+              <div className="text-xs text-slate-500">Total Customers</div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Quick Actions Grid */}
       <div>
-        <h2 className="text-lg font-bold text-slate-900 mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+        <h2 className="text-base font-bold text-slate-800 mb-4 px-1">Quick Actions</h2>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <button
             onClick={() => setCurrentView('invoices')}
-            className="p-5 bg-white rounded-2xl border border-slate-200 hover:border-blue-500 hover:shadow-md transition text-center group flex flex-col items-center justify-center space-y-2"
+            className="p-6 bg-[#0F9D58] hover:bg-[#0B7A44] rounded-2xl shadow-sm transition text-center group flex flex-col items-center justify-center space-y-3"
           >
-            <div className="p-3 rounded-xl bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition">
-              <FileSpreadsheet className="w-6 h-6" />
-            </div>
-            <span className="text-xs font-semibold text-slate-800">Create Invoice</span>
+            <FileSpreadsheet className="w-6 h-6 text-white opacity-90" />
+            <span className="text-sm font-semibold text-white">New Invoice</span>
           </button>
 
           <button
             onClick={() => setCurrentView('quotations')}
-            className="p-5 bg-white rounded-2xl border border-slate-200 hover:border-indigo-500 hover:shadow-md transition text-center group flex flex-col items-center justify-center space-y-2"
+            className="p-6 bg-[#0F9D58] hover:bg-[#0B7A44] rounded-2xl shadow-sm transition text-center group flex flex-col items-center justify-center space-y-3"
           >
-            <div className="p-3 rounded-xl bg-indigo-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition">
-              <FileCheck className="w-6 h-6" />
-            </div>
-            <span className="text-xs font-semibold text-slate-800">Create Quotation</span>
+            <FileCheck className="w-6 h-6 text-white opacity-90" />
+            <span className="text-sm font-semibold text-white">New Quotation</span>
           </button>
 
           <button
             onClick={() => setCurrentView('receipts')}
-            className="p-5 bg-white rounded-2xl border border-slate-200 hover:border-emerald-500 hover:shadow-md transition text-center group flex flex-col items-center justify-center space-y-2"
+            className="p-6 bg-[#0F9D58] hover:bg-[#0B7A44] rounded-2xl shadow-sm transition text-center group flex flex-col items-center justify-center space-y-3"
           >
-            <div className="p-3 rounded-xl bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition">
-              <Receipt className="w-6 h-6" />
-            </div>
-            <span className="text-xs font-semibold text-slate-800">Create Receipt</span>
+            <Receipt className="w-6 h-6 text-white opacity-90" />
+            <span className="text-sm font-semibold text-white">New Receipt</span>
           </button>
 
           <button
-            onClick={() => setCurrentView('letters')}
-            className="p-5 bg-white rounded-2xl border border-slate-200 hover:border-amber-500 hover:shadow-md transition text-center group flex flex-col items-center justify-center space-y-2"
+            className="p-6 bg-[#E77F67] hover:bg-[#D56A50] rounded-2xl shadow-sm transition text-center group flex flex-col items-center justify-center space-y-3"
           >
-            <div className="p-3 rounded-xl bg-amber-50 text-amber-600 group-hover:bg-amber-600 group-hover:text-white transition">
-              <FileText className="w-6 h-6" />
-            </div>
-            <span className="text-xs font-semibold text-slate-800">Create Letter</span>
-          </button>
-
-          <button
-            onClick={() => setCurrentView('history')}
-            className="p-5 bg-white rounded-2xl border border-slate-200 hover:border-purple-500 hover:shadow-md transition text-center group flex flex-col items-center justify-center space-y-2"
-          >
-            <div className="p-3 rounded-xl bg-purple-50 text-purple-600 group-hover:bg-purple-600 group-hover:text-white transition">
-              <History className="w-6 h-6" />
-            </div>
-            <span className="text-xs font-semibold text-slate-800">Document History</span>
-          </button>
-
-          <button
-            onClick={() => setCurrentView('settings')}
-            className="p-5 bg-white rounded-2xl border border-slate-200 hover:border-slate-500 hover:shadow-md transition text-center group flex flex-col items-center justify-center space-y-2"
-          >
-            <div className="p-3 rounded-xl bg-slate-100 text-slate-700 group-hover:bg-slate-800 group-hover:text-white transition">
-              <Settings className="w-6 h-6" />
-            </div>
-            <span className="text-xs font-semibold text-slate-800">Company Settings</span>
+            <Building2 className="w-6 h-6 text-white opacity-90" />
+            <span className="text-sm font-semibold text-white">Add Customer</span>
           </button>
         </div>
       </div>

@@ -55,30 +55,30 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const SidebarContent = (
     <div className="flex flex-col h-full">
       {/* ── Logo ─────────────────────────────────────── */}
-      <div className={`flex items-center gap-3 px-4 py-5 border-b border-green-100 ${collapsed ? 'justify-center' : ''}`}>
+      <div className={`flex items-center gap-3 px-4 py-5 border-b border-slate-800 ${collapsed ? 'justify-center' : ''}`}>
         {company?.logoUrl ? (
           <img
             src={company.logoUrl}
             alt="Logo"
-            className="w-8 h-8 object-contain rounded-lg bg-green-50 p-0.5 flex-shrink-0 border border-green-100"
+            className="w-8 h-8 object-contain rounded-lg bg-slate-800 p-0.5 flex-shrink-0"
           />
         ) : (
           <div className="w-8 h-8 rounded-xl bg-[#0F9D58] flex items-center justify-center font-black text-white text-xs flex-shrink-0">
-            IP
+            IH
           </div>
         )}
         {!collapsed && (
           <div className="min-w-0">
-            <p className="font-bold text-sm text-slate-800 truncate leading-tight">
-              {company?.companyName || 'InvoicePro'}
+            <p className="font-bold text-sm text-white truncate leading-tight">
+              InvoiceHub
             </p>
-            <span className="text-[9px] uppercase font-bold tracking-widest text-[#0F9D58]">Pro Plan</span>
+            <span className="text-[10px] text-slate-400">Create. Send. Get Paid.</span>
           </div>
         )}
       </div>
 
       {/* ── Nav Items ────────────────────────────────── */}
-      <nav className="flex-1 px-2 py-4 space-y-0.5 overflow-y-auto">
+      <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
         {navItems.map(({ id, label, icon: Icon }) => {
           const isActive = currentView === id;
           return (
@@ -87,10 +87,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
               id={`sidebar-nav-${id}`}
               onClick={() => handleNav(id)}
               title={collapsed ? label : undefined}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group ${
+              className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all group ${
                 isActive
-                  ? 'bg-[#0F9D58] text-white shadow-md shadow-[#0F9D58]/20'
-                  : 'text-slate-500 hover:text-[#0F9D58] hover:bg-green-50'
+                  ? 'bg-[#0F9D58] text-white shadow-md'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-800'
               } ${collapsed ? 'justify-center' : ''}`}
             >
               <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-white' : ''}`} />
@@ -101,29 +101,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </nav>
 
       {/* ── User Footer ──────────────────────────────── */}
-      <div className="border-t border-green-100 p-3 space-y-1">
-        {/* User info */}
-        <div className={`flex items-center gap-3 px-2 py-2 rounded-xl ${collapsed ? 'justify-center' : ''}`}>
-          <div className="w-8 h-8 rounded-full bg-[#0F9D58] flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
-            {initials}
-          </div>
-          {!collapsed && (
-            <div className="min-w-0 flex-1">
-              <p className="text-xs font-semibold text-slate-800 truncate">{user?.name}</p>
-              <p className="text-[10px] text-slate-400 truncate">{user?.email}</p>
-            </div>
-          )}
-        </div>
-
+      <div className="border-t border-slate-800 p-3 space-y-1">
         {/* Logout */}
         <button
           id="sidebar-logout-btn"
           onClick={onLogout}
           title={collapsed ? 'Sign out' : undefined}
-          className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-red-500 hover:bg-red-50 hover:text-red-600 transition-all ${collapsed ? 'justify-center' : ''}`}
+          className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm text-slate-300 hover:text-white hover:bg-slate-800 transition-all ${collapsed ? 'justify-center' : ''}`}
         >
-          <LogOut className="w-4 h-4 flex-shrink-0" />
-          {!collapsed && <span>Sign out</span>}
+          <LogOut className="w-4 h-4 flex-shrink-0 text-[#E77F67]" />
+          {!collapsed && <span>Sign Out</span>}
         </button>
       </div>
     </div>
@@ -142,7 +129,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* ── Mobile toggle button ─────────────────────── */}
       <button
         id="sidebar-mobile-toggle"
-        className="fixed top-4 left-4 z-50 lg:hidden bg-white border border-slate-200 text-slate-700 p-2 rounded-xl shadow-lg"
+        className="fixed top-4 left-4 z-50 lg:hidden bg-slate-900 border border-slate-700 text-white p-2 rounded-xl shadow-lg"
         onClick={() => setMobileOpen(v => !v)}
       >
         {mobileOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
@@ -150,7 +137,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* ── Mobile Sidebar (overlay) ─────────────────── */}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 w-60 bg-white border-r border-slate-200 transform transition-transform duration-300 ease-in-out lg:hidden no-print ${
+        className={`fixed inset-y-0 left-0 z-40 w-64 bg-[#111827] border-r border-slate-800 transform transition-transform duration-300 ease-in-out lg:hidden no-print ${
           mobileOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -159,8 +146,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* ── Desktop Sidebar (fixed) ──────────────────── */}
       <aside
-        className={`hidden lg:flex flex-col fixed inset-y-0 left-0 z-30 bg-white border-r border-slate-200 transition-all duration-300 ease-in-out no-print ${
-          collapsed ? 'w-[68px]' : 'w-60'
+        className={`hidden lg:flex flex-col fixed inset-y-0 left-0 z-30 bg-[#111827] border-r border-slate-800 transition-all duration-300 ease-in-out no-print ${
+          collapsed ? 'w-[72px]' : 'w-64'
         }`}
       >
         {SidebarContent}
@@ -169,7 +156,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <button
           id="sidebar-collapse-btn"
           onClick={() => setCollapsed(v => !v)}
-          className="absolute -right-3 top-20 w-6 h-6 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-400 hover:text-[#0F9D58] hover:border-[#0F9D58] transition-all shadow-md"
+          className="absolute -right-3 top-20 w-6 h-6 bg-slate-800 border border-slate-700 rounded-full flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700 transition-all shadow-md"
         >
           {collapsed
             ? <ChevronRight className="w-3 h-3" />
@@ -178,7 +165,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </aside>
 
       {/* ── Spacer so main content doesn't hide behind sidebar ── */}
-      <div className={`hidden lg:block flex-shrink-0 transition-all duration-300 ${collapsed ? 'w-[68px]' : 'w-60'}`} />
+      <div className={`hidden lg:block flex-shrink-0 transition-all duration-300 ${collapsed ? 'w-[72px]' : 'w-64'}`} />
     </>
   );
 };
