@@ -155,7 +155,7 @@ export function AdminPanel({ onBack }: Props) {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0D0D0D] text-white flex" style={{ fontFamily: "'Inter',sans-serif" }}>
+    <div className="min-h-screen bg-[#0D0D0D] text-slate-900 flex" style={{ fontFamily: "'Inter',sans-serif" }}>
 
       {/* ── Toast ────────────────────────────────────────────────── */}
       {toast && (
@@ -168,14 +168,14 @@ export function AdminPanel({ onBack }: Props) {
       {/* ── Delete confirm ────────────────────────────────────────── */}
       {deleteConfirm && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#1A1A1A] border border-white/10 rounded-2xl p-6 max-w-sm w-full shadow-2xl">
+          <div className="bg-white shadow-sm border border-slate-300 rounded-2xl p-6 max-w-sm w-full shadow-2xl">
             <div className="w-12 h-12 bg-red-500/20 rounded-xl flex items-center justify-center mb-4">
               <AlertTriangle className="w-6 h-6 text-red-400" />
             </div>
             <h3 className="text-lg font-bold mb-1">Delete User?</h3>
-            <p className="text-slate-400 text-sm mb-6">This action cannot be undone.</p>
+            <p className="text-slate-500 text-sm mb-6">This action cannot be undone.</p>
             <div className="flex gap-3">
-              <button onClick={() => setDeleteConfirm(null)} className="flex-1 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-sm font-semibold transition">Cancel</button>
+              <button onClick={() => setDeleteConfirm(null)} className="flex-1 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-sm font-semibold transition">Cancel</button>
               <button onClick={() => deleteUser(deleteConfirm)} className="flex-1 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-sm font-semibold transition">Delete</button>
             </div>
           </div>
@@ -185,13 +185,13 @@ export function AdminPanel({ onBack }: Props) {
       {/* ── Edit user modal ───────────────────────────────────────── */}
       {editingUser && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#1A1A1A] border border-white/10 rounded-2xl p-6 max-w-md w-full shadow-2xl">
+          <div className="bg-white shadow-sm border border-slate-300 rounded-2xl p-6 max-w-md w-full shadow-2xl">
             <div className="flex items-center justify-between mb-5">
               <h3 className="text-lg font-bold">Edit User</h3>
-              <button onClick={() => setEditingUser(null)} className="text-slate-400 hover:text-white"><X className="w-5 h-5" /></button>
+              <button onClick={() => setEditingUser(null)} className="text-slate-500 hover:text-slate-900"><X className="w-5 h-5" /></button>
             </div>
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4 p-3 bg-white/5 rounded-xl text-sm">
+              <div className="grid grid-cols-2 gap-4 p-3 bg-white rounded-xl text-sm">
                 <div><p className="text-xs text-slate-500 mb-0.5">Name</p><p className="font-medium">{editingUser.name}</p></div>
                 <div><p className="text-xs text-slate-500 mb-0.5">Email</p><p className="font-medium truncate">{editingUser.email}</p></div>
               </div>
@@ -200,23 +200,23 @@ export function AdminPanel({ onBack }: Props) {
                 { label: 'ROLE', key: 'role', options: ['USER','ADMIN'] },
               ].map(({ label, key, options }) => (
                 <div key={key}>
-                  <label className="text-xs text-slate-400 font-semibold mb-1 block">{label}</label>
+                  <label className="text-xs text-slate-500 font-semibold mb-1 block">{label}</label>
                   <select
                     value={(editingUser as any)[key]}
                     onChange={e => setEditingUser({ ...editingUser, [key]: e.target.value })}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#CAFF33]/50"
+                    className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F9D58]/50"
                   >
                     {options.map(o => <option key={o} value={o}>{o}</option>)}
                   </select>
                 </div>
               ))}
               <div>
-                <label className="text-xs text-slate-400 font-semibold mb-1 block">TRIAL USED</label>
+                <label className="text-xs text-slate-500 font-semibold mb-1 block">TRIAL USED</label>
                 <input type="number" min={0} value={editingUser.trialUsed}
                   onChange={e => setEditingUser({ ...editingUser, trialUsed: parseInt(e.target.value) || 0 })}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#CAFF33]/50" />
+                  className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F9D58]/50" />
               </div>
-              <div className="flex items-center justify-between p-3 bg-white/5 rounded-xl">
+              <div className="flex items-center justify-between p-3 bg-white rounded-xl">
                 <span className="text-sm font-medium">Account Active</span>
                 <button onClick={() => setEditingUser({ ...editingUser, isActive: !editingUser.isActive })}>
                   {editingUser.isActive
@@ -226,8 +226,8 @@ export function AdminPanel({ onBack }: Props) {
               </div>
             </div>
             <div className="flex gap-3 mt-6">
-              <button onClick={() => setEditingUser(null)} className="flex-1 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-sm font-semibold transition">Cancel</button>
-              <button onClick={saveUser} disabled={saving} className="flex-1 py-2.5 rounded-xl bg-[#CAFF33] text-black hover:bg-[#b8f000] text-sm font-bold transition disabled:opacity-50">
+              <button onClick={() => setEditingUser(null)} className="flex-1 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-sm font-semibold transition">Cancel</button>
+              <button onClick={saveUser} disabled={saving} className="flex-1 py-2.5 rounded-xl bg-[#0F9D58] text-white hover:bg-[#b8f000] text-sm font-bold transition disabled:opacity-50">
                 {saving ? 'Saving…' : 'Save Changes'}
               </button>
             </div>
@@ -236,29 +236,29 @@ export function AdminPanel({ onBack }: Props) {
       )}
 
       {/* ── Sidebar ───────────────────────────────────────────────── */}
-      <aside className="w-60 shrink-0 bg-[#111111] border-r border-white/5 flex flex-col">
-        <div className="p-5 border-b border-white/5">
+      <aside className="w-60 shrink-0 bg-[#111111] border-r border-slate-200 flex flex-col">
+        <div className="p-5 border-b border-slate-200">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 bg-[#CAFF33] rounded-lg flex items-center justify-center">
-              <Shield className="w-4 h-4 text-black" />
+            <div className="w-8 h-8 bg-[#0F9D58] rounded-lg flex items-center justify-center">
+              <Shield className="w-4 h-4 text-white" />
             </div>
             <div>
               <p className="text-sm font-bold leading-none">InvoicePro</p>
-              <p className="text-xs text-[#CAFF33] font-semibold mt-0.5">Admin Panel</p>
+              <p className="text-xs text-[#0F9D58] font-semibold mt-0.5">Admin Panel</p>
             </div>
           </div>
         </div>
         <nav className="flex-1 p-3 space-y-1">
           {navItems.map(item => (
             <button key={item.id} onClick={() => setTab(item.id)}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${tab === item.id ? 'bg-[#CAFF33] text-black' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}>
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${tab === item.id ? 'bg-[#0F9D58] text-white' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}>
               {item.icon}{item.label}
             </button>
           ))}
         </nav>
-        <div className="p-3 border-t border-white/5">
+        <div className="p-3 border-t border-slate-200">
           <button onClick={onBack}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 transition">
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition">
             <ArrowLeft className="w-4 h-4" />Back to App
           </button>
         </div>
@@ -267,13 +267,13 @@ export function AdminPanel({ onBack }: Props) {
       {/* ── Main ─────────────────────────────────────────────────── */}
       <main className="flex-1 overflow-auto flex flex-col">
         {/* Top bar */}
-        <div className="sticky top-0 z-10 bg-[#0D0D0D]/80 backdrop-blur-md border-b border-white/5 px-8 py-4 flex items-center justify-between">
+        <div className="sticky top-0 z-10 bg-[#0D0D0D]/80 backdrop-blur-md border-b border-slate-200 px-8 py-4 flex items-center justify-between">
           <div>
             <h1 className="text-lg font-bold capitalize">{tab}</h1>
             <p className="text-xs text-slate-500">InvoicePro Platform Management</p>
           </div>
           <button onClick={() => { fetchStats(); fetchUsers(); fetchPayments(); fetchSettings(); }}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-sm font-medium transition">
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white hover:bg-slate-100 text-sm font-medium transition">
             <RefreshCw className="w-4 h-4" />Refresh
           </button>
         </div>
@@ -281,7 +281,7 @@ export function AdminPanel({ onBack }: Props) {
         <div className="p-8 flex-1">
           {loading ? (
             <div className="flex items-center justify-center py-32">
-              <div className="animate-spin w-8 h-8 rounded-full border-2 border-[#CAFF33]/20 border-t-[#CAFF33]" />
+              <div className="animate-spin w-8 h-8 rounded-full border-2 border-[#0F9D58]/20 border-t-[#CAFF33]" />
             </div>
           ) : (
             <>
@@ -293,27 +293,27 @@ export function AdminPanel({ onBack }: Props) {
                       { label:'Total Users',    value: stats.totalUsers,    icon:<Users      className="w-5 h-5"/>, color:'text-blue-400',      bg:'bg-blue-400/10'    },
                       { label:'Active Users',   value: stats.activeUsers,   icon:<UserCheck  className="w-5 h-5"/>, color:'text-emerald-400',   bg:'bg-emerald-400/10' },
                       { label:'Pro / Business', value:`${stats.proUsers} / ${stats.businessUsers}`, icon:<BadgeCheck className="w-5 h-5"/>, color:'text-purple-400', bg:'bg-purple-400/10' },
-                      { label:'Total Docs',     value: stats.totalDocuments,icon:<FileText   className="w-5 h-5"/>, color:'text-[#CAFF33]',    bg:'bg-[#CAFF33]/10'   },
+                      { label:'Total Docs',     value: stats.totalDocuments,icon:<FileText   className="w-5 h-5"/>, color:'text-[#0F9D58]',    bg:'bg-[#0F9D58]/10'   },
                     ].map(card => (
-                      <div key={card.label} className="bg-[#1A1A1A] border border-white/5 rounded-2xl p-5">
+                      <div key={card.label} className="bg-white shadow-sm border border-slate-200 rounded-2xl p-5">
                         <div className={`w-10 h-10 ${card.bg} rounded-xl flex items-center justify-center mb-3 ${card.color}`}>{card.icon}</div>
                         <p className="text-2xl font-bold">{card.value}</p>
                         <p className="text-xs text-slate-500 mt-1">{card.label}</p>
                       </div>
                     ))}
                   </div>
-                  <div className="bg-[#1A1A1A] border border-white/5 rounded-2xl overflow-hidden">
-                    <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between">
+                  <div className="bg-white shadow-sm border border-slate-200 rounded-2xl overflow-hidden">
+                    <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
                       <h2 className="font-semibold text-sm">Recent Signups</h2>
-                      <button onClick={() => setTab('users')} className="text-xs text-[#CAFF33] font-semibold hover:underline flex items-center gap-1">
+                      <button onClick={() => setTab('users')} className="text-xs text-[#0F9D58] font-semibold hover:underline flex items-center gap-1">
                         View All <ChevronRight className="w-3 h-3" />
                       </button>
                     </div>
-                    <div className="divide-y divide-white/5">
+                    <div className="divide-y divide-slate-200">
                       {stats.recentUsers.slice(0,8).map(u => (
                         <div key={u.id} className="px-6 py-3 flex items-center justify-between">
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-[#CAFF33]/10 text-[#CAFF33] flex items-center justify-center text-xs font-bold uppercase">{ (u?.name || 'U').charAt(0) }</div>
+                            <div className="w-8 h-8 rounded-full bg-[#0F9D58]/10 text-[#0F9D58] flex items-center justify-center text-xs font-bold uppercase">{ (u?.name || 'U').charAt(0) }</div>
                             <div><p className="text-sm font-medium">{u?.name || 'Unknown'}</p><p className="text-xs text-slate-500">{u?.email || ''}</p></div>
                           </div>
                           <div className="flex items-center gap-2">
@@ -334,39 +334,39 @@ export function AdminPanel({ onBack }: Props) {
                     <div className="relative flex-1 max-w-sm">
                       <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
                       <input type="text" placeholder="Search users…" value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-                        className="w-full bg-white/5 border border-white/10 rounded-xl pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#CAFF33]/50 placeholder-slate-500" />
+                        className="w-full bg-white border border-slate-300 rounded-xl pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F9D58]/50 placeholder-slate-500" />
                     </div>
                     <span className="text-sm text-slate-500">{filteredUsers.length} users</span>
                   </div>
-                  <div className="bg-[#1A1A1A] border border-white/5 rounded-2xl overflow-hidden">
+                  <div className="bg-white shadow-sm border border-slate-200 rounded-2xl overflow-hidden">
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead>
-                          <tr className="border-b border-white/5">
+                          <tr className="border-b border-slate-200">
                             {['USER','PLAN','ROLE','TRIAL','STATUS','JOINED',''].map(h => (
                               <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-slate-500 first:pl-6">{h}</th>
                             ))}
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-white/5">
+                        <tbody className="divide-y divide-slate-200">
                           {filteredUsers.map(u => (
-                            <tr key={u.id} className="hover:bg-white/[0.02] transition-colors">
+                            <tr key={u.id} className="hover:bg-slate-50 transition-colors">
                               <td className="pl-6 pr-4 py-3">
                                 <div className="flex items-center gap-3">
-                                  <div className="w-8 h-8 rounded-full bg-[#CAFF33]/10 text-[#CAFF33] flex items-center justify-center text-xs font-bold uppercase shrink-0">{(u?.name || 'U').charAt(0)}</div>
+                                  <div className="w-8 h-8 rounded-full bg-[#0F9D58]/10 text-[#0F9D58] flex items-center justify-center text-xs font-bold uppercase shrink-0">{(u?.name || 'U').charAt(0)}</div>
                                   <div><p className="font-medium">{u?.name || 'Unknown'}</p><p className="text-xs text-slate-500">{u?.email || ''}</p></div>
                                 </div>
                               </td>
                               <td className="px-4 py-3"><span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${PLAN_COLORS[u.plan]||''}`}>{u.plan}</span></td>
                               <td className="px-4 py-3">
                                 {u.role==='ADMIN'
-                                  ? <span className="flex items-center gap-1 text-[#CAFF33] text-xs font-semibold"><Shield className="w-3 h-3"/>ADMIN</span>
-                                  : <span className="text-slate-400 text-xs">USER</span>}
+                                  ? <span className="flex items-center gap-1 text-[#0F9D58] text-xs font-semibold"><Shield className="w-3 h-3"/>ADMIN</span>
+                                  : <span className="text-slate-500 text-xs">USER</span>}
                               </td>
                               <td className="px-4 py-3">
                                 <div className="flex items-center gap-2">
                                   <span className="text-xs font-mono">{u.trialUsed}/{settings?.freeTrialLimit??5}</span>
-                                  <button onClick={() => resetTrials(u.id)} title="Reset" className="text-slate-500 hover:text-[#CAFF33] transition"><RefreshCw className="w-3.5 h-3.5"/></button>
+                                  <button onClick={() => resetTrials(u.id)} title="Reset" className="text-slate-500 hover:text-[#0F9D58] transition"><RefreshCw className="w-3.5 h-3.5"/></button>
                                 </div>
                               </td>
                               <td className="px-4 py-3">
@@ -378,8 +378,8 @@ export function AdminPanel({ onBack }: Props) {
                               <td className="px-4 py-3 text-xs text-slate-500">{new Date(u.createdAt).toLocaleDateString()}</td>
                               <td className="px-4 py-3">
                                 <div className="flex items-center gap-1">
-                                  <button onClick={() => setEditingUser(u)} className="p-1.5 rounded-lg hover:bg-white/10 text-slate-400 hover:text-white transition"><Edit2 className="w-3.5 h-3.5"/></button>
-                                  <button onClick={() => setDeleteConfirm(u.id)} className="p-1.5 rounded-lg hover:bg-red-500/20 text-slate-400 hover:text-red-400 transition"><Trash2 className="w-3.5 h-3.5"/></button>
+                                  <button onClick={() => setEditingUser(u)} className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-900 transition"><Edit2 className="w-3.5 h-3.5"/></button>
+                                  <button onClick={() => setDeleteConfirm(u.id)} className="p-1.5 rounded-lg hover:bg-red-500/20 text-slate-500 hover:text-red-400 transition"><Trash2 className="w-3.5 h-3.5"/></button>
                                 </div>
                               </td>
                             </tr>
@@ -395,20 +395,20 @@ export function AdminPanel({ onBack }: Props) {
               {/* ── PRICING ────────────────────────────────────────── */}
               {tab === 'pricing' && (
                 <div className="space-y-6 max-w-3xl">
-                  <p className="text-slate-400 text-sm">Edit the prices shown on the public Pricing page. Amounts in NGN (₦).</p>
+                  <p className="text-slate-500 text-sm">Edit the prices shown on the public Pricing page. Amounts in NGN (₦).</p>
                   {(['weekly','monthly','yearly'] as const).map(cycle => (
-                    <div key={cycle} className="bg-[#1A1A1A] border border-white/5 rounded-2xl overflow-hidden">
-                      <div className="px-6 py-4 border-b border-white/5"><h3 className="font-semibold capitalize">{cycle}</h3></div>
+                    <div key={cycle} className="bg-white shadow-sm border border-slate-200 rounded-2xl overflow-hidden">
+                      <div className="px-6 py-4 border-b border-slate-200"><h3 className="font-semibold capitalize">{cycle}</h3></div>
                       <div className="p-6 grid grid-cols-3 gap-4">
                         {(['free','pro','business'] as const).map(plan => (
                           <div key={plan}>
-                            <label className="text-xs font-semibold text-slate-400 mb-1.5 block uppercase">{plan}</label>
+                            <label className="text-xs font-semibold text-slate-500 mb-1.5 block uppercase">{plan}</label>
                             <div className="relative">
                               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">₦</span>
                               <input type="number" min={0} value={pricing[cycle][plan]}
                                 onChange={e => setPricing(prev => ({ ...prev, [cycle]: { ...prev[cycle], [plan]: e.target.value } }))}
                                 disabled={plan==='free'}
-                                className="w-full bg-white/5 border border-white/10 rounded-xl pl-7 pr-3 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#CAFF33]/50 disabled:opacity-40" />
+                                className="w-full bg-white border border-slate-300 rounded-xl pl-7 pr-3 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#0F9D58]/50 disabled:opacity-40" />
                             </div>
                           </div>
                         ))}
@@ -416,7 +416,7 @@ export function AdminPanel({ onBack }: Props) {
                     </div>
                   ))}
                   <button onClick={saveSettings} disabled={saving}
-                    className="flex items-center gap-2 px-6 py-3 rounded-xl bg-[#CAFF33] text-black font-bold hover:bg-[#b8f000] transition disabled:opacity-50">
+                    className="flex items-center gap-2 px-6 py-3 rounded-xl bg-[#0F9D58] text-white font-bold hover:bg-[#b8f000] transition disabled:opacity-50">
                     <Save className="w-4 h-4"/>{saving?'Saving…':'Save Pricing'}
                   </button>
                 </div>
@@ -425,25 +425,25 @@ export function AdminPanel({ onBack }: Props) {
               {/* ── TRIALS ─────────────────────────────────────────── */}
               {tab === 'trials' && (
                 <div className="space-y-6 max-w-xl">
-                  <p className="text-slate-400 text-sm">Configure how many free documents new users get and which types count toward the trial.</p>
-                  <div className="bg-[#1A1A1A] border border-white/5 rounded-2xl p-6 space-y-6">
+                  <p className="text-slate-500 text-sm">Configure how many free documents new users get and which types count toward the trial.</p>
+                  <div className="bg-white shadow-sm border border-slate-200 rounded-2xl p-6 space-y-6">
                     <div>
-                      <label className="text-xs font-semibold text-slate-400 mb-2 block">FREE TRIAL DOCUMENT LIMIT</label>
+                      <label className="text-xs font-semibold text-slate-500 mb-2 block">FREE TRIAL DOCUMENT LIMIT</label>
                       <p className="text-xs text-slate-500 mb-4">Number of free documents each new user gets before needing a subscription.</p>
                       <div className="flex items-center gap-5">
                         <button onClick={() => setTrialLimit(Math.max(0, trialLimit-1))}
-                          className="w-11 h-11 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center text-2xl font-bold transition">−</button>
-                        <span className="text-5xl font-black tabular-nums w-16 text-center text-[#CAFF33]">{trialLimit}</span>
+                          className="w-11 h-11 rounded-xl bg-white hover:bg-slate-100 flex items-center justify-center text-2xl font-bold transition">−</button>
+                        <span className="text-5xl font-black tabular-nums w-16 text-center text-[#0F9D58]">{trialLimit}</span>
                         <button onClick={() => setTrialLimit(trialLimit+1)}
-                          className="w-11 h-11 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center text-2xl font-bold transition">+</button>
+                          className="w-11 h-11 rounded-xl bg-white hover:bg-slate-100 flex items-center justify-center text-2xl font-bold transition">+</button>
                       </div>
                     </div>
-                    <div className="pt-5 border-t border-white/5">
-                      <label className="text-xs font-semibold text-slate-400 mb-2 block">DOCUMENT TYPES COUNTED TOWARD TRIAL</label>
+                    <div className="pt-5 border-t border-slate-200">
+                      <label className="text-xs font-semibold text-slate-500 mb-2 block">DOCUMENT TYPES COUNTED TOWARD TRIAL</label>
                       <div className="grid grid-cols-2 gap-3 mt-3">
                         {DOC_TYPES.map(dt => (
                           <button key={dt} onClick={() => toggleDocType(dt)}
-                            className={`flex items-center justify-between px-4 py-3 rounded-xl border text-sm font-medium transition ${trialDocTypes.includes(dt)?'bg-[#CAFF33]/10 border-[#CAFF33]/40 text-[#CAFF33]':'bg-white/5 border-white/10 text-slate-400'}`}>
+                            className={`flex items-center justify-between px-4 py-3 rounded-xl border text-sm font-medium transition ${trialDocTypes.includes(dt)?'bg-[#0F9D58]/10 border-[#0F9D58]/40 text-[#0F9D58]':'bg-white border-slate-300 text-slate-500'}`}>
                             {dt}
                             {trialDocTypes.includes(dt)?<Check className="w-4 h-4"/>:<X className="w-4 h-4 opacity-30"/>}
                           </button>
@@ -452,7 +452,7 @@ export function AdminPanel({ onBack }: Props) {
                     </div>
                   </div>
                   <button onClick={saveSettings} disabled={saving}
-                    className="flex items-center gap-2 px-6 py-3 rounded-xl bg-[#CAFF33] text-black font-bold hover:bg-[#b8f000] transition disabled:opacity-50">
+                    className="flex items-center gap-2 px-6 py-3 rounded-xl bg-[#0F9D58] text-white font-bold hover:bg-[#b8f000] transition disabled:opacity-50">
                     <Save className="w-4 h-4"/>{saving?'Saving…':'Save Trial Settings'}
                   </button>
                 </div>
@@ -460,26 +460,26 @@ export function AdminPanel({ onBack }: Props) {
 
               {/* ── PAYMENTS ───────────────────────────────────────── */}
               {tab === 'payments' && (
-                <div className="bg-[#1A1A1A] border border-white/5 rounded-2xl overflow-hidden">
-                  <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between">
+                <div className="bg-white shadow-sm border border-slate-200 rounded-2xl overflow-hidden">
+                  <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
                     <h2 className="font-semibold text-sm">All Payments</h2>
                     <span className="text-xs text-slate-500">{payments.length} records</span>
                   </div>
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead>
-                        <tr className="border-b border-white/5">
+                        <tr className="border-b border-slate-200">
                           {['USER','PLAN','AMOUNT','STATUS','REFERENCE','DATE'].map(h => (
                             <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-slate-500 first:pl-6">{h}</th>
                           ))}
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-white/5">
+                      <tbody className="divide-y divide-slate-200">
                         {payments.map(p => (
-                          <tr key={p.id} className="hover:bg-white/[0.02] transition-colors">
+                          <tr key={p.id} className="hover:bg-slate-50 transition-colors">
                             <td className="pl-6 pr-4 py-3"><p className="font-medium">{p.userName}</p><p className="text-xs text-slate-500">{p.userEmail}</p></td>
                             <td className="px-4 py-3"><span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${PLAN_COLORS[p.plan]||''}`}>{p.plan}</span></td>
-                            <td className="px-4 py-3 font-mono font-semibold text-[#CAFF33]">₦{p.amount.toLocaleString()}</td>
+                            <td className="px-4 py-3 font-mono font-semibold text-[#0F9D58]">₦{p.amount.toLocaleString()}</td>
                             <td className="px-4 py-3"><span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${STATUS_COLORS[p.status]||''}`}>{p.status}</span></td>
                             <td className="px-4 py-3 text-xs text-slate-500 font-mono">{p.reference||'—'}</td>
                             <td className="px-4 py-3 text-xs text-slate-500">{new Date(p.createdAt).toLocaleDateString()}</td>
