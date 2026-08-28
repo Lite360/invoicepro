@@ -109,7 +109,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
             </div>
           </div>
           {/* Card 3 */}
-          <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 flex items-center space-x-4">
+          <div onClick={() => setCurrentView('payments')} className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 flex items-center space-x-4 cursor-pointer hover:shadow-md transition">
             <div className="p-3 bg-amber-50 rounded-xl">
               <Clock className="w-6 h-6 text-amber-500" />
             </div>
@@ -119,12 +119,12 @@ export const Dashboard: React.FC<DashboardProps> = ({
             </div>
           </div>
           {/* Card 4 */}
-          <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 flex items-center space-x-4">
+          <div onClick={() => setCurrentView('customers')} className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 flex items-center space-x-4 cursor-pointer hover:shadow-md transition">
             <div className="p-3 bg-purple-50 rounded-xl">
               <Building2 className="w-6 h-6 text-purple-600" />
             </div>
             <div>
-              <div className="text-2xl font-bold text-slate-900">0</div>
+              <div className="text-2xl font-bold text-slate-900">3</div>
               <div className="text-xs text-slate-500">Total Customers</div>
             </div>
           </div>
@@ -160,6 +160,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
           </button>
 
           <button
+            onClick={() => setCurrentView('customers')}
             className="p-6 bg-[#E77F67] hover:bg-[#D56A50] rounded-2xl shadow-sm transition text-center group flex flex-col items-center justify-center space-y-3"
           >
             <Building2 className="w-6 h-6 text-white opacity-90" />

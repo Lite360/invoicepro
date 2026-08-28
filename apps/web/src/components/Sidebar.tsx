@@ -12,6 +12,9 @@ import {
   ChevronRight,
   Menu,
   X,
+  Users,
+  CreditCard,
+  BadgeCheck,
 } from 'lucide-react';
 import { Company, User } from '../types';
 
@@ -29,7 +32,10 @@ const navItems = [
   { id: 'quotations',  label: 'Quotations',         icon: FileCheck },
   { id: 'receipts',    label: 'Receipts',           icon: Receipt },
   { id: 'letters',     label: 'Letters',            icon: FileText },
+  { id: 'customers',   label: 'Customers',          icon: Users },
+  { id: 'payments',    label: 'Payments',           icon: CreditCard },
   { id: 'history',     label: 'Document History',   icon: History },
+  { id: 'subscription',label: 'Subscription',       icon: BadgeCheck },
   { id: 'settings',    label: 'Company Settings',   icon: Settings },
 ];
 

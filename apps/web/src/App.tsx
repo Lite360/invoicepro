@@ -10,6 +10,9 @@ import { ReceiptModule } from './components/ReceiptModule';
 import { LetterModule } from './components/LetterModule';
 import { DocumentHistory } from './components/DocumentHistory';
 import { DocumentPreviewModal } from './components/DocumentPreviewModal';
+import { CustomerModule } from './components/CustomerModule';
+import { PaymentModule } from './components/PaymentModule';
+import { SubscriptionModule } from './components/SubscriptionModule';
 import { LoginPage } from './components/LoginPage';
 import { SignupPage } from './components/SignupPage';
 import { LandingPage } from './components/LandingPage';
@@ -236,6 +239,15 @@ export function App() {
           )}
           {currentView === 'history' && (
             <DocumentHistory company={company} onSelectDocumentForPreview={handleOpenPreview} />
+          )}
+          {currentView === 'customers' && (
+            <CustomerModule company={company} />
+          )}
+          {currentView === 'payments' && (
+            <PaymentModule company={company} />
+          )}
+          {currentView === 'subscription' && (
+            <SubscriptionModule user={user} />
           )}
           {currentView === 'settings' && (
             <CompanySettings company={company} onUpdateCompany={handleSetupComplete} />
