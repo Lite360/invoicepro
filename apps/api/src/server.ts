@@ -38,15 +38,17 @@ async function main() {
     }
 
     if (process.env.ADMIN_EMAIL) {
-        try {
-            await (prisma.user as any).update({
-                where: { email: process.env.ADMIN_EMAIL },
-                data: { role: 'ADMIN' }
-            });
-            console.log(`Promoted ${process.env.ADMIN_EMAIL} to ADMIN`);
-        } catch (e) {
-            // User might not exist yet, ignore
-        }
+        (async () => {
+            try {
+                await (prisma.user as any).update({
+                    where: { email: process.env.ADMIN_EMAIL },
+                    data: { role: 'ADMIN' }
+                });
+                console.log(`Promoted ${process.env.ADMIN_EMAIL} to ADMIN`);
+            } catch (e) {
+                // User might not exist yet, ignore
+            }
+        })();
     }
 
     // ── Auth Routes ──────────────────────────────────────────────────
