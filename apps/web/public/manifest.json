@@ -1,0 +1,38 @@
+{
+  "name": "InvoicePro",
+  "short_name": "InvoicePro",
+  "description": "Professional invoicing, quotations, receipts and business letters",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#ffffff",
+  "theme_color": "#0F9D58",
+  "categories": ["business", "finance", "productivity"],
+  "icons": [
+    {
+      "src": "/icon-192x192.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512x512.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "New Invoice",
+      "url": "/?view=invoices",
+      "description": "Create a new invoice"
+    },
+    {
+      "name": "New Quotation",
+      "url": "/?view=quotations",
+      "description": "Create a new quotation"
+    }
+  ]
+}
