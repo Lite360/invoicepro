@@ -84,6 +84,51 @@ async function main() {
             }
         });
 
+        const company = await prisma.company.findFirst();
+        const invoiceNumber = await generateDocNumber(company?.invoicePrefix || 'INV', 'invoice');
+        
+        const createdInvoice = await prisma.invoice.create({
+            data: {
+                number: invoiceNumber,
+                date: new Date().toISOString().split('T')[0],
+                dueDate: new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0],
+                customerName: name, 
+                customerEmail: email, 
+                customerPhone: '',
+                customerAddress: '',
+                projectTitle: 'System Setup & Registration',
+                subtotal: 1500,
+                discountPercent: 0,
+                discountAmount: 0,
+                vatPercent: 0,
+                vatAmount: 0,
+                grandTotal: 1500,
+                notes: 'Automated invoice for system registration and initial setup.',
+                paymentInstructions: `Bank: ${company?.bankName || ''} | Acc: ${company?.accountNumber || ''}`,
+                status: 'Issued',
+                items: {
+                    create: [{
+                        description: 'Registration & Account Setup',
+                        quantity: 1,
+                        unitPrice: 1500,
+                        amount: 1500
+                    }]
+                }
+            }
+        });
+
+        await prisma.document.create({
+            data: {
+                documentNumber: createdInvoice.number,
+                type: 'Invoice',
+                customer: createdInvoice.customerName,
+                amount: createdInvoice.grandTotal,
+                status: createdInvoice.status,
+                date: createdInvoice.date,
+                referenceId: createdInvoice.id
+            }
+        });
+
         const token = app.jwt.sign({
             id: user.id,
             email: user.email,

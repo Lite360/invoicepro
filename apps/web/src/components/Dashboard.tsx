@@ -75,7 +75,14 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
         <div className="relative z-10">
           <div className="flex items-center space-x-2 text-sm text-green-100 mb-1">
-            <span>Good afternoon 👋</span>
+            <span>
+              {(() => {
+                const hour = new Date().getHours();
+                if (hour < 12) return 'Good morning';
+                if (hour < 17) return 'Good afternoon';
+                return 'Good evening';
+              })()} 👋
+            </span>
           </div>
           <h1 className="text-4xl font-extrabold tracking-tight mb-2">{user?.name ? user.name.split(' ')[0] : 'there'}!</h1>
           <p className="text-green-50 text-sm">
