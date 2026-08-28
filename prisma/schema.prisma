@@ -1,0 +1,167 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Company {
+  id                 String   @id @default("default")
+  companyName        String
+  logoUrl            String?
+  watermarkUrl       String?
+  businessAddress    String
+  phone              String
+  email              String
+  website            String?
+  registrationNumber String
+  taxNumber          String?
+  bankName           String
+  accountName        String
+  accountNumber      String
+  signatureUrl       String?
+  footerText         String?
+  primaryColor       String   @default("#0f172a")
+  secondaryColor     String   @default("#2563eb")
+  currency           String   @default("NGN")
+  invoicePrefix      String   @default("INV")
+  quotationPrefix    String   @default("QTN")
+  receiptPrefix      String   @default("RCT")
+  letterPrefix       String   @default("LTR")
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+model Customer {
+  id        String   @id @default(uuid())
+  name      String
+  email     String?
+  phone     String?
+  address   String?
+  createdAt DateTime @default(now())
+}
+
+model Invoice {
+  id                  String        @id @default(uuid())
+  number              String        @unique
+  date                String
+  dueDate             String
+  customerName        String
+  customerPhone       String?
+  customerEmail       String?
+  customerAddress     String?
+  projectTitle        String?
+  items               InvoiceItem[]
+  subtotal            Float
+  discountPercent     Float         @default(0)
+  discountAmount      Float         @default(0)
+  vatPercent          Float         @default(0)
+  vatAmount           Float         @default(0)
+  grandTotal          Float
+  notes               String?
+  paymentInstructions String?
+  status              String        @default("Issued")
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+}
+
+model InvoiceItem {
+  id          String   @id @default(uuid())
+  invoiceId   String
+  invoice     Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  description String
+  quantity    Float
+  unitPrice   Float
+  amount      Float
+}
+
+model Quotation {
+  id                   String          @id @default(uuid())
+  number               String          @unique
+  date                 String
+  dueDate              String
+  customerName         String
+  customerPhone        String?
+  customerEmail        String?
+  customerAddress      String?
+  projectTitle         String?
+  items                QuotationItem[]
+  subtotal             Float
+  discountPercent      Float           @default(0)
+  discountAmount       Float           @default(0)
+  vatPercent           Float           @default(0)
+  vatAmount            Float           @default(0)
+  grandTotal           Float
+  notes                String?
+  paymentInstructions  String?
+  status               String          @default("Pending")
+  convertedToInvoiceId String?
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @updatedAt
+}
+
+model QuotationItem {
+  id          String    @id @default(uuid())
+  quotationId String
+  quotation   Quotation @relation(fields: [quotationId], references: [id], onDelete: Cascade)
+  description String
+  quantity    Float
+  unitPrice   Float
+  amount      Float
+}
+
+model Receipt {
+  id              String   @id @default(uuid())
+  number          String   @unique
+  customerName    String
+  paymentDate     String
+  paymentMethod   String
+  amountPaid      Float
+  balance         Float    @default(0)
+  referenceNumber String?
+  notes           String?
+  status          String   @default("Paid")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Letter {
+  id               String   @id @default(uuid())
+  number           String   @unique
+  type             String
+  date             String
+  recipientName    String
+  recipientTitle   String?
+  recipientAddress String?
+  subject          String
+  body             String
+  showSignature    Boolean  @default(true)
+  status           String   @default("Final")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model Document {
+  id             String   @id @default(uuid())
+  documentNumber String   @unique
+  type           String
+  customer       String
+  amount         Float    @default(0)
+  status         String
+  date           String
+  fileUrl        String?
+  referenceId    String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

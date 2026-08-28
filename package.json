@@ -1,0 +1,21 @@
+{
+    "name": "branddocs",
+    "version": "1.0.0",
+    "private": true,
+    "scripts": {
+        "dev": "concurrently \"npm run dev:api\" \"npm run dev:web\"",
+        "dev:api": "npm run dev --prefix apps/api",
+        "dev:web": "npm run dev --prefix apps/web",
+        "db:push": "npx prisma db push",
+        "postinstall": "npx prisma generate",
+        "build": "npm run build:web && npm run build:api",
+        "build:web": "npm run build --prefix apps/web",
+        "build:api": "tsc -p apps/api/tsconfig.json"
+    },
+    "devDependencies": {
+        "@prisma/client": "^5.14.0",
+        "concurrently": "^8.2.2",
+        "prisma": "^5.14.0"
+    },
+    "workspaces": ["apps/*"]
+}

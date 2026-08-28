@@ -1,0 +1,17 @@
+2026-07-23 21:40:05.365 [info] Error: ENOENT: no such file or directory, mkdir '/var/task/uploads'
+    at Object.mkdirSync (node:fs:1350:26)
+    at Object.<anonymous> (/var/task/apps/api/src/server.js:20:18)
+    at Module.<anonymous> (/opt/rust/bytecode.js:2:1451)
+    at O.l._compile (/opt/rust/bytecode.js:2:3854)
+    at Object..js (node:internal/modules/cjs/loader:2002:10)
+    at Module.load (node:internal/modules/cjs/loader:1594:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1396:12)
+    at /opt/rust/nodejs.js:2:14220
+    at Module.Gn (/opt/rust/nodejs.js:2:14598)
+    at e.<computed>.st._load (/opt/rust/nodejs.js:2:14190) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'mkdir',
+  path: '/var/task/uploads'
+}
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
