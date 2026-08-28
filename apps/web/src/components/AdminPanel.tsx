@@ -142,8 +142,8 @@ export function AdminPanel({ onBack }: Props) {
     setTrialDocTypes(prev => prev.includes(dt) ? prev.filter(d => d !== dt) : [...prev, dt]);
 
   const filteredUsers = users.filter(u =>
-    u.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    u.email.toLowerCase().includes(searchQuery.toLowerCase())
+    (u?.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (u?.email || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const navItems: { id: AdminTab; label: string; icon: React.ReactNode }[] = [
@@ -313,8 +313,8 @@ export function AdminPanel({ onBack }: Props) {
                       {stats.recentUsers.slice(0,8).map(u => (
                         <div key={u.id} className="px-6 py-3 flex items-center justify-between">
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-[#CAFF33]/10 text-[#CAFF33] flex items-center justify-center text-xs font-bold uppercase">{u.name.charAt(0)}</div>
-                            <div><p className="text-sm font-medium">{u.name}</p><p className="text-xs text-slate-500">{u.email}</p></div>
+                            <div className="w-8 h-8 rounded-full bg-[#CAFF33]/10 text-[#CAFF33] flex items-center justify-center text-xs font-bold uppercase">{ (u?.name || 'U').charAt(0) }</div>
+                            <div><p className="text-sm font-medium">{u?.name || 'Unknown'}</p><p className="text-xs text-slate-500">{u?.email || ''}</p></div>
                           </div>
                           <div className="flex items-center gap-2">
                             <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${PLAN_COLORS[u.plan]||'bg-slate-700 text-slate-300'}`}>{u.plan}</span>
@@ -353,8 +353,8 @@ export function AdminPanel({ onBack }: Props) {
                             <tr key={u.id} className="hover:bg-white/[0.02] transition-colors">
                               <td className="pl-6 pr-4 py-3">
                                 <div className="flex items-center gap-3">
-                                  <div className="w-8 h-8 rounded-full bg-[#CAFF33]/10 text-[#CAFF33] flex items-center justify-center text-xs font-bold uppercase shrink-0">{u.name.charAt(0)}</div>
-                                  <div><p className="font-medium">{u.name}</p><p className="text-xs text-slate-500">{u.email}</p></div>
+                                  <div className="w-8 h-8 rounded-full bg-[#CAFF33]/10 text-[#CAFF33] flex items-center justify-center text-xs font-bold uppercase shrink-0">{(u?.name || 'U').charAt(0)}</div>
+                                  <div><p className="font-medium">{u?.name || 'Unknown'}</p><p className="text-xs text-slate-500">{u?.email || ''}</p></div>
                                 </div>
                               </td>
                               <td className="px-4 py-3"><span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${PLAN_COLORS[u.plan]||''}`}>{u.plan}</span></td>

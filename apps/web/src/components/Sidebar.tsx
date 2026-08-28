@@ -58,7 +58,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const initials = user
-    ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+    ? (user.name || 'Unknown').split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
     : '??';
 
   const handleNav = (id: string) => {
