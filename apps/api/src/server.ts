@@ -268,16 +268,16 @@ async function main() {
             totalCustomers,
             allInvoices
         ] = await Promise.all([
-            prisma.invoice.count(),
-            prisma.quotation.count(),
-            prisma.receipt.count(),
-            prisma.letter.count(),
+            prisma.invoice.count({ where: { userId } }),
+            prisma.quotation.count({ where: { userId } }),
+            prisma.receipt.count({ where: { userId } }),
+            prisma.letter.count({ where: { userId } }),
             prisma.document.findMany({
             where: { userId },
                 take: 5,
                 orderBy: { createdAt: 'desc' }
             }),
-            prisma.customer.count(),
+            prisma.customer.count({ where: { userId } }),
             prisma.invoice.findMany({
             where: { userId }, select: { grandTotal: true, status: true } })
         ]);
