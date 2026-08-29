@@ -221,28 +221,28 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
                   </div>
                 </div>
 
-                {/* Responsive Table with horizontal scroll on small screens */}
-                <div className="overflow-x-auto -mx-5 sm:mx-0 mb-6 sm:mb-8">
-                  <table className="w-full text-xs sm:text-sm border-collapse min-w-[480px]">
+                {/* Responsive Table */}
+                <div className="overflow-x-auto mb-6 sm:mb-8 w-full max-w-[100%]">
+                  <table className="w-full text-[10px] sm:text-sm border-collapse min-w-full">
                     <thead>
                       <tr className="text-white text-left font-semibold" style={{ backgroundColor: primaryColor }}>
-                        <th className="p-2 sm:p-3 text-center w-8 sm:w-12">#</th>
-                        <th className="p-2 sm:p-3">Item Description</th>
-                        <th className="p-2 sm:p-3 text-center w-14 sm:w-20">Qty</th>
-                        <th className="p-2 sm:p-3 text-right w-24 sm:w-28">Unit Price</th>
-                        <th className="p-2 sm:p-3 text-right w-24 sm:w-32">Amount</th>
+                        <th className="p-1 sm:p-3 text-center w-6 sm:w-12">#</th>
+                        <th className="p-1 sm:p-3">Item Description</th>
+                        <th className="p-1 sm:p-3 text-center w-8 sm:w-20">Qty</th>
+                        <th className="p-1 sm:p-3 text-right w-16 sm:w-28">Unit Price</th>
+                        <th className="p-1 sm:p-3 text-right w-16 sm:w-32">Amount</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-200">
                       {(data.items || []).map((item: any, idx: number) => (
                         <tr key={idx}>
-                          <td className="p-2 sm:p-3 text-center text-slate-500">{idx + 1}</td>
-                          <td className="p-2 sm:p-3 font-medium text-slate-800">{item.description}</td>
-                          <td className="p-2 sm:p-3 text-center text-slate-600">{item.quantity}</td>
-                          <td className="p-2 sm:p-3 text-right text-slate-600">
+                          <td className="p-1 sm:p-3 text-center text-slate-500">{idx + 1}</td>
+                          <td className="p-1 sm:p-3 font-medium text-slate-800 break-words">{item.description}</td>
+                          <td className="p-1 sm:p-3 text-center text-slate-600">{item.quantity}</td>
+                          <td className="p-1 sm:p-3 text-right text-slate-600 truncate">
                             {currencySymbol}{Number(item.unitPrice || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                           </td>
-                          <td className="p-2 sm:p-3 text-right font-semibold text-slate-900">
+                          <td className="p-1 sm:p-3 text-right font-semibold text-slate-900 truncate">
                             {currencySymbol}{Number(item.amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                           </td>
                         </tr>
