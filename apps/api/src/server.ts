@@ -225,13 +225,18 @@ async function main() {
     }
     );
 
-    // 1. Company Profile & Setup Wizard
     app.get('/api/company', async (req, reply) => {
         const company = await prisma.company.findFirst();
+        let isMaintenance = false;
+        try {
+            const settings = await (prisma as any).adminSettings.findUnique({ where: { id: 'global' } });
+            isMaintenance = settings?.maintenanceMode || false;
+        } catch { }
+        
         if (!company) {
-            return reply.send({ setupRequired: true, company: null });
+            return reply.send({ setupRequired: true, company: null, maintenanceMode: isMaintenance });
         }
-        return reply.send({ setupRequired: false, company });
+        return reply.send({ setupRequired: false, company, maintenanceMode: isMaintenance });
     });
 
     app.post('/api/company', async (req, reply) => {
@@ -1004,6 +1009,77 @@ async function main() {
             create: { id: 'global', ...data }
         });
         return reply.send(settings);
+    });
+
+    // ── Public Pricing ──────────────────────────────────────────────
+    app.get('/api/pricing', async (req, reply) => {
+        let settings = await (prisma as any).adminSettings.findUnique({ where: { id: 'global' } });
+        if (!settings) {
+            settings = await (prisma as any).adminSettings.create({ data: { id: 'global' } });
+        }
+        let pricing = {
+            weekly:  { free: '0', pro: '850',   business: '2200'  },
+            monthly: { free: '0', pro: '2500',  business: '7500'  },
+            yearly:  { free: '0', pro: '22000', business: '65000' }
+        };
+        try {
+            const p = JSON.parse(settings.pricingJson);
+            if (p?.weekly) pricing = p;
+        } catch { }
+        return reply.send({ pricing });
+    });
+
+    // ── Paystack Verify ─────────────────────────────────────────────
+    app.post('/api/payments/verify', async (req, reply) => {
+        try { await req.jwtVerify(); } catch { return reply.status(401).send({ error: 'Unauthorized' }); }
+        const { reference, plan, cycle, amount } = req.body as any;
+        if (!reference) return reply.status(400).send({ error: 'Missing reference' });
+
+        const payload = req.user as { id: string; email: string; name: string };
+        const user = await prisma.user.findUnique({ where: { id: payload.id } });
+        if (!user) return reply.status(404).send({ error: 'User not found' });
+
+        try {
+            const secretKey = process.env.PAYSTACK_SECRET_KEY;
+            if (!secretKey) return reply.status(500).send({ error: 'Paystack not configured on server' });
+
+            const res = await fetch(`https://api.paystack.co/transaction/verify/${reference}`, {
+                headers: { Authorization: `Bearer ${secretKey}` }
+            });
+            const data = await res.json() as any;
+
+            if (data.status && data.data?.status === 'success') {
+                const expiry = new Date();
+                if (cycle === 'weekly') expiry.setDate(expiry.getDate() + 7);
+                else if (cycle === 'yearly') expiry.setFullYear(expiry.getFullYear() + 1);
+                else expiry.setMonth(expiry.getMonth() + 1);
+
+                await (prisma.user as any).update({
+                    where: { id: user.id },
+                    data: { plan: plan.toUpperCase(), planExpiry: expiry }
+                });
+
+                await (prisma as any).payment.create({
+                    data: {
+                        userId: user.id,
+                        userName: user.name,
+                        userEmail: user.email,
+                        plan: plan.toUpperCase(),
+                        amount: Number(amount) || (data.data.amount / 100),
+                        currency: data.data.currency || 'NGN',
+                        status: 'Confirmed',
+                        reference
+                    }
+                });
+
+                return reply.send({ success: true, plan: plan.toUpperCase() });
+            } else {
+                return reply.status(400).send({ error: 'Payment verification failed' });
+            }
+        } catch (e: any) {
+            console.error(e);
+            return reply.status(500).send({ error: 'Failed to verify transaction' });
+        }
     });
 
     if (!process.env.VERCEL) {

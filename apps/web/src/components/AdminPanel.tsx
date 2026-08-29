@@ -63,6 +63,8 @@ export function AdminPanel({ onBack }: Props) {
   const [saving,        setSaving]        = useState(false);
   const [toast,         setToast]         = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [maintenanceMode, setMaintenanceMode] = useState(false);
+  const [togglingMaintenance, setTogglingMaintenance] = useState(false);
 
   const token       = localStorage.getItem('invoicepro_token');
   const authHeaders = { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` };
@@ -90,6 +92,7 @@ export function AdminPanel({ onBack }: Props) {
     const data: AdminSettings = await res.json();
     setSettings(data);
     setTrialLimit(data.freeTrialLimit);
+    setMaintenanceMode((data as any).maintenanceMode || false);
     try { const p = JSON.parse(data.pricingJson);  if (p?.weekly) setPricing(p); }    catch { /**/ }
     try { const d = JSON.parse(data.trialDocTypes); if (Array.isArray(d)) setTrialDocTypes(d); } catch { /**/ }
   }, []);
@@ -302,6 +305,58 @@ export function AdminPanel({ onBack }: Props) {
                       </div>
                     ))}
                   </div>
+
+                  {/* Maintenance Mode Toggle */}
+                  <div className={`rounded-2xl border p-5 flex items-center justify-between gap-4 ${
+                    maintenanceMode
+                      ? 'bg-amber-50 border-amber-200'
+                      : 'bg-white border-slate-200 shadow-sm'
+                  }`}>
+                    <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                        maintenanceMode ? 'bg-amber-400/20 text-amber-600' : 'bg-slate-100 text-slate-500'
+                      }`}>
+                        <Activity className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-sm">Maintenance Mode</p>
+                        <p className="text-xs text-slate-500 mt-0.5">
+                          {maintenanceMode
+                            ? '🔒 App is locked — only admins can access it'
+                            : 'App is live and accessible to all users'}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={async () => {
+                        setTogglingMaintenance(true);
+                        try {
+                          const res = await fetch(`${API}/api/admin/settings`, {
+                            method: 'PUT',
+                            headers: authHeaders,
+                            body: JSON.stringify({ maintenanceMode: !maintenanceMode })
+                          });
+                          if (res.ok) {
+                            setMaintenanceMode(!maintenanceMode);
+                            showToast(!maintenanceMode ? 'Maintenance mode enabled' : 'Maintenance mode disabled');
+                          } else {
+                            showToast('Failed to update', 'error');
+                          }
+                        } finally {
+                          setTogglingMaintenance(false);
+                        }
+                      }}
+                      disabled={togglingMaintenance}
+                      className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors flex-shrink-0 ${
+                        maintenanceMode ? 'bg-amber-400' : 'bg-slate-300'
+                      } disabled:opacity-60`}
+                    >
+                      <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform ${
+                        maintenanceMode ? 'translate-x-6' : 'translate-x-1'
+                      }`} />
+                    </button>
+                  </div>
+
                   <div className="bg-white shadow-sm border border-slate-200 rounded-2xl overflow-hidden">
                     <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
                       <h2 className="font-semibold text-sm">Recent Signups</h2>

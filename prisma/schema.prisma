@@ -178,6 +178,7 @@ model AdminSettings {
   pricingJson     String   @default("{}")
   // JSON array of doc types that count toward trial e.g. ["Invoice","Quotation","Receipt","Letter"]
   trialDocTypes   String   @default("[\"Invoice\",\"Quotation\",\"Receipt\",\"Letter\"]")
+  maintenanceMode Boolean  @default(false)
   updatedAt       DateTime @updatedAt
 }
 

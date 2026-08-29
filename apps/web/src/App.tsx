@@ -14,6 +14,7 @@ import { CustomerModule } from './components/CustomerModule';
 import { PaymentModule } from './components/PaymentModule';
 import { SubscriptionModule } from './components/SubscriptionModule';
 import { AdminPanel } from './components/AdminPanel';
+import { MaintenanceScreen } from './components/MaintenanceScreen';
 import { LoginPage } from './components/LoginPage';
 import { SignupPage } from './components/SignupPage';
 import { LandingPage } from './components/LandingPage';
@@ -37,6 +38,7 @@ export function App() {
   const [company, setCompany] = useState<Company | null>(null);
   const [setupRequired, setSetupRequired] = useState<boolean | null>(null);
   const [currentView, setCurrentView] = useState<string>('dashboard');
+  const [maintenanceMode, setMaintenanceMode] = useState(false);
 
   // Preview Modal State
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
@@ -72,6 +74,7 @@ export function App() {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       const data = await res.json();
+      if (data.maintenanceMode !== undefined) setMaintenanceMode(data.maintenanceMode);
       if (data.setupRequired) {
         setSetupRequired(true);
       } else {
@@ -188,6 +191,11 @@ export function App() {
 
   if (setupRequired) {
     return <SetupWizard onComplete={handleSetupComplete} />;
+  }
+
+  // ── Maintenance Mode (block non-admins) ───────────────────────
+  if (maintenanceMode && user?.role !== 'ADMIN') {
+    return <MaintenanceScreen onRefresh={checkCompany} />;
   }
 
   if (currentView === 'admin' && user?.role === 'ADMIN') {
