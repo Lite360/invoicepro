@@ -1,4 +1,4 @@
-const CACHE_NAME = 'invoicepro-v1';
+const CACHE_NAME = 'invoicepro-v2';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -44,7 +44,15 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Cache-first for static assets
+  // Network-first for HTML (to get latest Vite JS bundle hashes)
+  if (event.request.mode === 'navigate' || event.request.destination === 'document') {
+    event.respondWith(
+      fetch(event.request).catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  // Cache-first (falling back to network) for static assets like images, js, css
   event.respondWith(
     caches.match(event.request).then(
       (cached) =>
@@ -55,6 +63,8 @@ self.addEventListener('fetch', (event) => {
             caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
           }
           return response;
+        }).catch(() => {
+          // Ignore network errors on asset fetching
         })
     )
   );
