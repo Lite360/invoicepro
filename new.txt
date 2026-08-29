@@ -1,2 +1,20 @@
 VITE_PAYSTACK_PUBLIC_KEY	        
 PAYSTACK_SECRET_KEY	        sk_live_xxxxx (or sk_test_xxxxx for testing)
+
+
+
+
+🔗 Register the Webhook in Paystack
+Go to dashboard.paystack.com → Settings → API Keys & Webhooks
+Scroll to the Webhook URL section
+Enter your webhook URL:
+https://invoicespro.vercel.app/api/payments/webhook
+Click Update to save
+How it works end-to-end
+User clicks "Upgrade" 
+  → Paystack popup opens
+  → User pays
+  → Your frontend calls /api/payments/verify (immediate upgrade)
+  → Paystack ALSO calls your webhook /api/payments/webhook (backup confirmation)
+  → Both routes update user plan in database ✅
+The webhook acts as a safety net — if the user closes the browser before your app can verify, Paystack will still call your server directly and upgrade the plan automatically. The webhook is secured with HMAC-SHA512 signature verification so nobody can fake a payment event.

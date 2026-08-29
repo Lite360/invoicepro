@@ -42,7 +42,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
   const fetchStats = async () => {
     try {
-      const res = await fetch('/api/dashboard/stats');
+      const res = await fetch('/api/dashboard/stats', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('invoicepro_token')}`,
+        },
+      });
       const data = await res.json();
       setStats(data);
     } catch (e) {

@@ -22,7 +22,11 @@ export const CustomerModule: React.FC<CustomerModuleProps> = ({ company }) => {
 
   const fetchCustomers = async () => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/customers`);
+      const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/customers`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('invoicepro_token')}`,
+        },
+      });
       const data = await res.json();
       setCustomers(data);
     } catch (error) {
@@ -36,9 +40,12 @@ export const CustomerModule: React.FC<CustomerModuleProps> = ({ company }) => {
     if (!formData.name) return alert('Name is required');
     setIsSubmitting(true);
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/customers`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/customers`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('invoicepro_token')}`,
+        },
         body: JSON.stringify(formData)
       });
       if (res.ok) {

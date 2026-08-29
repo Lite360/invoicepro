@@ -38,7 +38,10 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
     try {
       const response = await fetch('/api/pdf/generate', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('invoicepro_token')}`,
+        },
         body: JSON.stringify({ type, data, htmlOnly: true }),
       });
       const html = await response.text();

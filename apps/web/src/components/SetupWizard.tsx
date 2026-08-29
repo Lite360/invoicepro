@@ -43,6 +43,9 @@ export const SetupWizard: React.FC<SetupWizardProps> = ({ onComplete, existingCo
     try {
       const res = await fetch('/api/upload', {
         method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('invoicepro_token')}`,
+        },
         body,
       });
       const data = await res.json();
@@ -62,7 +65,10 @@ export const SetupWizard: React.FC<SetupWizardProps> = ({ onComplete, existingCo
     try {
       const res = await fetch('/api/company', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('invoicepro_token')}`,
+        },
         body: JSON.stringify(formData),
       });
       const data = await res.json();

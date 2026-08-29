@@ -80,11 +80,12 @@ async function main() {
             }
         });
 
-        const company = await prisma.company.findFirst();
-        const invoiceNumber = await generateDocNumber(company?.invoicePrefix || 'INV', 'invoice');
+        const company = await prisma.company.findUnique({ where: { userId: user.id } });
+        const invoiceNumber = await generateDocNumber(company?.invoicePrefix || 'INV', 'invoice', user.id);
         
         const createdInvoice = await prisma.invoice.create({
             data: {
+                userId: user.id,
                 number: invoiceNumber,
                 date: new Date().toISOString().split('T')[0],
                 dueDate: new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0],
@@ -115,6 +116,7 @@ async function main() {
 
         await prisma.document.create({
             data: {
+                userId: user.id,
                 documentNumber: createdInvoice.number,
                 type: 'Invoice',
                 customer: createdInvoice.customerName,
@@ -225,8 +227,18 @@ async function main() {
     }
     );
 
-    app.get('/api/company', async (req, reply) => {
-        const company = await prisma.company.findFirst();
+    
+    const isAuth = async (req: any, reply: any) => {
+        try {
+            await req.jwtVerify();
+        } catch {
+            return reply.status(401).send({ error: 'Unauthorized.' });
+        }
+    };
+
+    app.get('/api/company', { preValidation: [isAuth] }, async (req: any, reply: any) => {
+        const userId = (req.user as any).id;
+        const company = await prisma.company.findUnique({ where: { userId: (req.user as any)?.id || userId } });
         let isMaintenance = false;
         try {
             const settings = await (prisma as any).adminSettings.findUnique({ where: { id: 'global' } });
@@ -239,9 +251,10 @@ async function main() {
         return reply.send({ setupRequired: false, company, maintenanceMode: isMaintenance });
     });
 
-    app.post('/api/company', async (req, reply) => {
+    app.post('/api/company', { preValidation: [isAuth] }, async (req: any, reply: any) => {
+        const userId = (req.user as any).id;
         const body = req.body as any;
-        let company = await prisma.company.findFirst();
+        let company = await prisma.company.findUnique({ where: { userId } });
         if (company) {
             company = await prisma.company.update({
                 where: {
@@ -252,7 +265,7 @@ async function main() {
         } else {
             company = await prisma.company.create({
                 data: {
-                    id: 'default',
+                    userId,
                     ...body
                 }
             });
@@ -290,7 +303,8 @@ async function main() {
     });
 
     // 3. Dashboard Statistics
-    app.get('/api/dashboard/stats', async (req, reply) => {
+    app.get('/api/dashboard/stats', { preValidation: [isAuth] }, async (req: any, reply: any) => {
+        const userId = (req.user as any).id;
         const [
             totalInvoices,
             totalQuotations,
@@ -305,11 +319,13 @@ async function main() {
             prisma.receipt.count(),
             prisma.letter.count(),
             prisma.document.findMany({
+            where: { userId },
                 take: 5,
                 orderBy: { createdAt: 'desc' }
             }),
             prisma.customer.count(),
-            prisma.invoice.findMany({ select: { grandTotal: true, status: true } })
+            prisma.invoice.findMany({
+            where: { userId }, select: { grandTotal: true, status: true } })
         ]);
 
         const pendingPaymentsAmount = allInvoices
@@ -331,27 +347,28 @@ async function main() {
     });
 
     // Helper for generating document numbers
-    async function generateDocNumber(prefix: string, modelName: string) {
+    async function generateDocNumber(prefix: string, modelName: string, userId: string) {
         const currentYear = new Date().getFullYear();
         let count = 0;
         if (modelName === 'invoice')
-            count = await prisma.invoice.count();
+            count = await prisma.invoice.count({ where: { userId } });
         else if (modelName === 'quotation')
-            count = await prisma.quotation.count();
+            count = await prisma.quotation.count({ where: { userId } });
         else if (modelName === 'receipt')
-            count = await prisma.receipt.count();
+            count = await prisma.receipt.count({ where: { userId } });
         else if (modelName === 'letter')
-            count = await prisma.letter.count();
+            count = await prisma.letter.count({ where: { userId } });
 
         const nextNum = (count + 1).toString().padStart(6, '0');
         return `${prefix}-${currentYear}-${nextNum}`;
     }
 
-    app.get('/api/number-gen/:type', async (req, reply) => {
+    app.get('/api/number-gen/:type', { preValidation: [isAuth] }, async (req: any, reply: any) => {
+        const userId = (req.user as any).id;
         const { type } = req.params as {
             type: string
         };
-        const company = await prisma.company.findFirst();
+        const company = await prisma.company.findUnique({ where: { userId: (req.user as any)?.id || userId } });
         const invPrefix = company?.invoicePrefix || 'INV';
         const qtnPrefix = company?.quotationPrefix || 'QTN';
         const rctPrefix = company?.receiptPrefix || 'RCT';
@@ -359,26 +376,29 @@ async function main() {
 
         let num = '';
         if (type === 'invoice')
-            num = await generateDocNumber(invPrefix, 'invoice');
+            num = await generateDocNumber(invPrefix, 'invoice', (req.user as any)?.id || userId);
         else if (type === 'quotation')
-            num = await generateDocNumber(qtnPrefix, 'quotation');
+            num = await generateDocNumber(qtnPrefix, 'quotation', (req.user as any)?.id || userId);
         else if (type === 'receipt')
-            num = await generateDocNumber(rctPrefix, 'receipt');
+            num = await generateDocNumber(rctPrefix, 'receipt', (req.user as any)?.id || userId);
         else if (type === 'letter')
-            num = await generateDocNumber(ltrPrefix, 'letter');
+            num = await generateDocNumber(ltrPrefix, 'letter', (req.user as any)?.id || userId);
 
         return reply.send({ number: num });
     }
     );
 
     // 3.5 Customers API
-    app.get('/api/customers', async (req, reply) => {
+    app.get('/api/customers', { preValidation: [isAuth] }, async (req: any, reply: any) => {
+        const userId = (req.user as any).id;
         const customers = await prisma.customer.findMany({
+            where: { userId },
             orderBy: { createdAt: 'desc' }
         });
 
         // Calculate total billed for each customer by fetching all their invoices
-        const invoices = await prisma.invoice.findMany({ select: { customerName: true, grandTotal: true } });
+        const invoices = await prisma.invoice.findMany({
+            where: { userId }, select: { customerName: true, grandTotal: true } });
 
         const customersWithBilled = customers.map(c => {
             const totalBilled = invoices
@@ -390,19 +410,23 @@ async function main() {
         return reply.send(customersWithBilled);
     });
 
-    app.post('/api/customers', async (req, reply) => {
+    app.post('/api/customers', { preValidation: [isAuth] }, async (req: any, reply: any) => {
+        const userId = (req.user as any).id;
         const { name, email, phone, address } = req.body as any;
         if (!name) return reply.status(400).send({ error: 'Customer name is required' });
 
         const customer = await prisma.customer.create({
-            data: { name, email, phone, address }
+            data: {
+                userId, name, email, phone, address }
         });
         return reply.send(customer);
     });
 
     // 3.6 Payments API
-    app.get('/api/payments', async (req, reply) => {
+    app.get('/api/payments', { preValidation: [isAuth] }, async (req: any, reply: any) => {
+        const userId = (req.user as any).id;
         const invoices = await prisma.invoice.findMany({
+            where: { userId },
             orderBy: { createdAt: 'desc' }
         });
 
@@ -421,8 +445,10 @@ async function main() {
     });
 
     // 4. Invoices API
-    app.get('/api/invoices', async (req, reply) => {
+    app.get('/api/invoices', { preValidation: [isAuth] }, async (req: any, reply: any) => {
+        const userId = (req.user as any).id;
         const invoices = await prisma.invoice.findMany({
+            where: { userId },
             include: {
                 items: true
             },
@@ -433,20 +459,22 @@ async function main() {
         return reply.send(invoices);
     });
 
-    app.post('/api/invoices', async (req, reply) => {
+    app.post('/api/invoices', { preValidation: [isAuth] }, async (req: any, reply: any) => {
+        const userId = (req.user as any).id;
         const data = req.body as any;
         const {
             items,
             ...invoiceData
         } = data;
 
-        const company = await prisma.company.findFirst();
+        const company = await prisma.company.findUnique({ where: { userId: (req.user as any)?.id || userId } });
         if (!invoiceData.number) {
-            invoiceData.number = await generateDocNumber(company?.invoicePrefix || 'INV', 'invoice');
+            invoiceData.number = await generateDocNumber(company?.invoicePrefix || 'INV', 'invoice', (req.user as any)?.id || userId);
         }
 
         const created = await prisma.invoice.create({
             data: {
+                userId,
                 ...invoiceData,
                 items: {
                     create: (items || []).map(
@@ -476,6 +504,7 @@ async function main() {
                 date: created.date
             },
             create: {
+                userId,
                 documentNumber: created.number,
                 type: 'Invoice',
                 customer: created.customerName,
@@ -489,7 +518,8 @@ async function main() {
         return reply.send(created);
     });
 
-    app.delete('/api/invoices/:id', async (req, reply) => {
+    app.delete('/api/invoices/:id', { preValidation: [isAuth] }, async (req: any, reply: any) => {
+        const userId = (req.user as any).id;
         const { id } = req.params as {
             id: string
         };
@@ -514,8 +544,10 @@ async function main() {
     });
 
     // 5. Quotations API
-    app.get('/api/quotations', async (req, reply) => {
+    app.get('/api/quotations', { preValidation: [isAuth] }, async (req: any, reply: any) => {
+        const userId = (req.user as any).id;
         const quotations = await prisma.quotation.findMany({
+            where: { userId },
             include: {
                 items: true
             },
@@ -526,20 +558,22 @@ async function main() {
         return reply.send(quotations);
     });
 
-    app.post('/api/quotations', async (req, reply) => {
+    app.post('/api/quotations', { preValidation: [isAuth] }, async (req: any, reply: any) => {
+        const userId = (req.user as any).id;
         const data = req.body as any;
         const {
             items,
             ...quotationData
         } = data;
 
-        const company = await prisma.company.findFirst();
+        const company = await prisma.company.findUnique({ where: { userId: (req.user as any)?.id || userId } });
         if (!quotationData.number) {
-            quotationData.number = await generateDocNumber(company?.quotationPrefix || 'QTN', 'quotation');
+            quotationData.number = await generateDocNumber(company?.quotationPrefix || 'QTN', 'quotation', (req.user as any)?.id || userId);
         }
 
         const created = await prisma.quotation.create({
             data: {
+                userId,
                 ...quotationData,
                 items: {
                     create: (items || []).map(
@@ -568,6 +602,7 @@ async function main() {
                 date: created.date
             },
             create: {
+                userId,
                 documentNumber: created.number,
                 type: 'Quotation',
                 customer: created.customerName,
@@ -581,7 +616,8 @@ async function main() {
         return reply.send(created);
     });
 
-    app.post('/api/quotations/:id/convert', async (req, reply) => {
+    app.post('/api/quotations/:id/convert', { preValidation: [isAuth] }, async (req: any, reply: any) => {
+        const userId = (req.user as any).id;
         const { id } = req.params as {
             id: string
         };
@@ -598,11 +634,12 @@ async function main() {
             return reply.status(404).send({ error: 'Quotation not found' });
         }
 
-        const company = await prisma.company.findFirst();
-        const invNumber = await generateDocNumber(company?.invoicePrefix || 'INV', 'invoice');
+        const company = await prisma.company.findUnique({ where: { userId: (req.user as any)?.id || userId } });
+        const invNumber = await generateDocNumber(company?.invoicePrefix || 'INV', 'invoice', (req.user as any)?.id || userId);
 
         const createdInvoice = await prisma.invoice.create({
             data: {
+                userId,
                 number: invNumber,
                 date: new Date().toISOString().split('T')[0],
                 dueDate: qtn.dueDate,
@@ -645,6 +682,7 @@ async function main() {
         // Create Document record
         await prisma.document.create({
             data: {
+                userId,
                 documentNumber: createdInvoice.number,
                 type: 'Invoice',
                 customer: createdInvoice.customerName,
@@ -658,7 +696,8 @@ async function main() {
         return reply.send({ success: true, invoice: createdInvoice });
     });
 
-    app.delete('/api/quotations/:id', async (req, reply) => {
+    app.delete('/api/quotations/:id', { preValidation: [isAuth] }, async (req: any, reply: any) => {
+        const userId = (req.user as any).id;
         const { id } = req.params as {
             id: string
         };
@@ -683,8 +722,10 @@ async function main() {
     });
 
     // 6. Receipts API
-    app.get('/api/receipts', async (req, reply) => {
+    app.get('/api/receipts', { preValidation: [isAuth] }, async (req: any, reply: any) => {
+        const userId = (req.user as any).id;
         const receipts = await prisma.receipt.findMany({
+            where: { userId },
             orderBy: {
                 createdAt: 'desc'
             }
@@ -692,12 +733,13 @@ async function main() {
         return reply.send(receipts);
     });
 
-    app.post('/api/receipts', async (req, reply) => {
+    app.post('/api/receipts', { preValidation: [isAuth] }, async (req: any, reply: any) => {
+        const userId = (req.user as any).id;
         const data = req.body as any;
-        const company = await prisma.company.findFirst();
+        const company = await prisma.company.findUnique({ where: { userId: (req.user as any)?.id || userId } });
 
         if (!data.number) {
-            data.number = await generateDocNumber(company?.receiptPrefix || 'RCT', 'receipt');
+            data.number = await generateDocNumber(company?.receiptPrefix || 'RCT', 'receipt', (req.user as any)?.id || userId);
         }
 
         const created = await prisma.receipt.create({ data });
@@ -713,6 +755,7 @@ async function main() {
                 date: created.paymentDate
             },
             create: {
+                userId,
                 documentNumber: created.number,
                 type: 'Receipt',
                 customer: created.customerName,
@@ -726,7 +769,8 @@ async function main() {
         return reply.send(created);
     });
 
-    app.delete('/api/receipts/:id', async (req, reply) => {
+    app.delete('/api/receipts/:id', { preValidation: [isAuth] }, async (req: any, reply: any) => {
+        const userId = (req.user as any).id;
         const { id } = req.params as {
             id: string
         };
@@ -751,8 +795,10 @@ async function main() {
     });
 
     // 7. Letters API
-    app.get('/api/letters', async (req, reply) => {
+    app.get('/api/letters', { preValidation: [isAuth] }, async (req: any, reply: any) => {
+        const userId = (req.user as any).id;
         const letters = await prisma.letter.findMany({
+            where: { userId },
             orderBy: {
                 createdAt: 'desc'
             }
@@ -760,12 +806,13 @@ async function main() {
         return reply.send(letters);
     });
 
-    app.post('/api/letters', async (req, reply) => {
+    app.post('/api/letters', { preValidation: [isAuth] }, async (req: any, reply: any) => {
+        const userId = (req.user as any).id;
         const data = req.body as any;
-        const company = await prisma.company.findFirst();
+        const company = await prisma.company.findUnique({ where: { userId: (req.user as any)?.id || userId } });
 
         if (!data.number) {
-            data.number = await generateDocNumber(company?.letterPrefix || 'LTR', 'letter');
+            data.number = await generateDocNumber(company?.letterPrefix || 'LTR', 'letter', (req.user as any)?.id || userId);
         }
 
         const created = await prisma.letter.create({ data });
@@ -781,6 +828,7 @@ async function main() {
                 date: created.date
             },
             create: {
+                userId,
                 documentNumber: created.number,
                 type: 'Letter',
                 customer: created.recipientName,
@@ -794,7 +842,8 @@ async function main() {
         return reply.send(created);
     });
 
-    app.delete('/api/letters/:id', async (req, reply) => {
+    app.delete('/api/letters/:id', { preValidation: [isAuth] }, async (req: any, reply: any) => {
+        const userId = (req.user as any).id;
         const { id } = req.params as {
             id: string
         };
@@ -819,8 +868,10 @@ async function main() {
     });
 
     // 8. Documents History API
-    app.get('/api/documents', async (req, reply) => {
+    app.get('/api/documents', { preValidation: [isAuth] }, async (req: any, reply: any) => {
+        const userId = (req.user as any).id;
         const documents = await prisma.document.findMany({
+            where: { userId },
             orderBy: {
                 createdAt: 'desc'
             }
@@ -828,7 +879,8 @@ async function main() {
         return reply.send(documents);
     });
 
-    app.delete('/api/documents/:id', async (req, reply) => {
+    app.delete('/api/documents/:id', { preValidation: [isAuth] }, async (req: any, reply: any) => {
+        const userId = (req.user as any).id;
         const { id } = req.params as {
             id: string
         };
@@ -874,13 +926,14 @@ async function main() {
     );
 
     // 9. PDF Generation / Preview Route
-    app.post('/api/pdf/generate', async (req, reply) => {
+    app.post('/api/pdf/generate', { preValidation: [isAuth] }, async (req: any, reply: any) => {
+        const userId = (req.user as any).id;
         const { type, data, htmlOnly } = req.body as {
             type: any;
             data: any;
             htmlOnly?: boolean
         };
-        const company = await prisma.company.findFirst();
+        const company = await prisma.company.findUnique({ where: { userId: (req.user as any)?.id || userId } });
 
         if (!company) {
             return reply.status(400).send({ error: 'Company settings not configured yet' });

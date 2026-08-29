@@ -8,7 +8,9 @@ generator client {
 }
 
 model Company {
-  id                 String   @id @default("default")
+  id                 String   @id @default(uuid())
+  userId             String   @unique
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   companyName        String
   logoUrl            String?
   watermarkUrl       String?
@@ -36,6 +38,8 @@ model Company {
 
 model Customer {
   id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   name      String
   email     String?
   phone     String?
@@ -45,6 +49,8 @@ model Customer {
 
 model Invoice {
   id                  String        @id @default(uuid())
+  userId              String
+  user                User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   number              String        @unique
   date                String
   dueDate             String
@@ -79,6 +85,8 @@ model InvoiceItem {
 
 model Quotation {
   id                   String          @id @default(uuid())
+  userId               String
+  user                 User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   number               String          @unique
   date                 String
   dueDate              String
@@ -114,6 +122,8 @@ model QuotationItem {
 
 model Receipt {
   id              String   @id @default(uuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   number          String   @unique
   customerName    String
   paymentDate     String
@@ -129,6 +139,8 @@ model Receipt {
 
 model Letter {
   id               String   @id @default(uuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   number           String   @unique
   type             String
   date             String
@@ -145,6 +157,8 @@ model Letter {
 
 model Document {
   id             String   @id @default(uuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   documentNumber String   @unique
   type           String
   customer       String
@@ -167,6 +181,13 @@ model User {
   planExpiry  DateTime?
   trialUsed   Int       @default(0)
   isActive    Boolean   @default(true)
+  company     Company?
+  customers   Customer[]
+  invoices    Invoice[]
+  quotations  Quotation[]
+  receipts    Receipt[]
+  letters     Letter[]
+  documents   Document[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 }
