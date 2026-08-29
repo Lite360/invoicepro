@@ -37,7 +37,9 @@ export const InvoiceModule: React.FC<InvoiceModuleProps> = ({ company, onPreview
 
   const fetchNumber = async () => {
     try {
-      const res = await fetch('/api/number-gen/invoice');
+      const res = await fetch('/api/number-gen/invoice', {
+        headers: { Authorization: `Bearer ${localStorage.getItem('invoicepro_token')}` }
+      });
       const data = await res.json();
       if (data.number) {
         setFormData((prev) => ({ ...prev, number: data.number }));

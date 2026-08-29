@@ -56,7 +56,9 @@ export const LetterModule: React.FC<LetterModuleProps> = ({ company, onPreview }
 
   const fetchNumber = async () => {
     try {
-      const res = await fetch('/api/number-gen/letter');
+      const res = await fetch('/api/number-gen/letter', {
+        headers: { Authorization: `Bearer ${localStorage.getItem('invoicepro_token')}` }
+      });
       const data = await res.json();
       if (data.number) {
         setFormData((prev) => ({ ...prev, number: data.number }));

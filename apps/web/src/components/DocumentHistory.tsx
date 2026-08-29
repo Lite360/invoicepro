@@ -35,9 +35,11 @@ export const DocumentHistory: React.FC<DocumentHistoryProps> = ({
 
   const fetchDocuments = async () => {
     try {
-      const res = await fetch('/api/documents');
+      const res = await fetch('/api/documents', {
+        headers: { Authorization: `Bearer ${localStorage.getItem('invoicepro_token')}` }
+      });
       const data = await res.json();
-      setDocuments(data);
+      setDocuments(Array.isArray(data) ? data : []);
     } catch (e) {
       console.error('Failed to fetch documents history', e);
     } finally {
@@ -48,7 +50,10 @@ export const DocumentHistory: React.FC<DocumentHistoryProps> = ({
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this document record?')) return;
     try {
-      await fetch(`/api/documents/${id}`, { method: 'DELETE' });
+      await fetch(`/api/documents/${id}`, { 
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${localStorage.getItem('invoicepro_token')}` }
+      });
       fetchDocuments();
     } catch (e) {
       console.error('Error deleting document', e);
@@ -63,7 +68,9 @@ export const DocumentHistory: React.FC<DocumentHistoryProps> = ({
     else if (doc.type === 'Letter') endpoint = '/api/letters';
 
     try {
-      const res = await fetch(endpoint);
+      const res = await fetch(endpoint, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('invoicepro_token')}` }
+      });
       const list = await res.json();
       const match = list.find((item: any) => item.number === doc.documentNumber);
       if (match) {

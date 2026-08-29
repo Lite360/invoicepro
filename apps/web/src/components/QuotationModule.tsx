@@ -36,7 +36,9 @@ export const QuotationModule: React.FC<QuotationModuleProps> = ({ company, onPre
 
   const fetchNumber = async () => {
     try {
-      const res = await fetch('/api/number-gen/quotation');
+      const res = await fetch('/api/number-gen/quotation', {
+        headers: { Authorization: `Bearer ${localStorage.getItem('invoicepro_token')}` }
+      });
       const data = await res.json();
       if (data.number) setFormData((prev) => ({ ...prev, number: data.number }));
     } catch (e) {
