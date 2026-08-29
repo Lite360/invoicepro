@@ -80,6 +80,8 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
       if (!printEl) return;
 
       const originalClasses = printEl.className;
+      const originalStyle = printEl.getAttribute('style') || '';
+      
       // Strip classes that interfere with PDF bounds or add unnecessary visual frames
       printEl.className = originalClasses
         .replace(/print:[^\s]+/g, '')
@@ -87,7 +89,13 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
         .replace('shadow-xl', '')
         .replace('border-slate-200', '')
         .replace('border', '')
-        .replace('rounded-xl', '');
+        .replace('rounded-xl', '')
+        .replace(/w-full/g, '')
+        .replace(/max-w-[^\s]+/g, '');
+        
+      // Temporarily force A4 width for the PDF generator so it doesn't look like a mobile view
+      printEl.style.width = '794px';
+      printEl.style.maxWidth = '794px';
       
       // @ts-ignore
       const opt = {
@@ -102,6 +110,7 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
       await html2pdf().set(opt).from(printEl).save();
       
       printEl.className = originalClasses;
+      printEl.setAttribute('style', originalStyle);
     } catch (e) {
       console.error('Frontend PDF Generation failed', e);
     }
@@ -113,8 +122,8 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-start justify-center p-2 sm:p-4 overflow-y-auto no-print">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full flex flex-col overflow-hidden border border-slate-100 my-2 sm:my-4">
+    <div className="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 no-print overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-2xl w-[95vw] max-w-[794px] h-[95vh] flex flex-col overflow-hidden border border-slate-100 relative">
         {/* Modal Header */}
         <div className="px-4 sm:px-6 py-3 sm:py-4 bg-slate-900 text-white flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-800 gap-3">
           <div className="flex items-center justify-between sm:justify-start w-full sm:w-auto">
@@ -159,10 +168,11 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
         </div>
 
         {/* Printable Document View */}
-        <div className="flex-1 overflow-y-auto p-3 sm:p-6 lg:p-8 bg-slate-100">
+        <div className="flex-1 overflow-x-hidden overflow-y-auto p-2 sm:p-6 lg:p-8 bg-slate-100 w-full relative">
           <div
             id="printable-document"
-            className="bg-white mx-auto shadow-xl rounded-xl p-5 sm:p-8 lg:p-10 max-w-3xl relative min-h-[297mm] print:min-h-0 print:p-8 print:shadow-none print:border-none print:m-0 text-slate-800 border border-slate-200"
+            className="bg-white mx-auto shadow-xl rounded-xl p-4 sm:p-8 lg:p-10 w-full max-w-[794px] box-border relative min-h-[297mm] print:min-h-0 print:p-8 print:shadow-none print:border-none print:m-0 text-slate-800 border border-slate-200 overflow-hidden"
+            style={{ boxSizing: 'border-box' }}
           >
             {/* Watermark */}
             {company.watermarkUrl && (
@@ -175,18 +185,18 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
 
             {/* Header */}
             <div className="border-b-2 pb-4 sm:pb-6 mb-6 sm:mb-8 flex flex-col sm:flex-row justify-between items-start gap-3 sm:gap-0" style={{ borderColor: primaryColor }}>
-              <div className="min-w-0">
+              <div className="min-w-0 flex-1 break-words">
                 {company.logoUrl && (
                   <img src={company.logoUrl} alt="Logo" className="max-h-12 sm:max-h-16 mb-2 sm:mb-3 object-contain" />
                 )}
-                <h1 className="text-lg sm:text-2xl font-bold tracking-tight" style={{ color: primaryColor }}>
+                <h1 className="text-lg sm:text-2xl font-bold tracking-tight break-words" style={{ color: primaryColor }}>
                   {company.companyName}
                 </h1>
-                <p className="text-[11px] sm:text-xs text-slate-600 mt-1">{company.businessAddress}</p>
-                <p className="text-[11px] sm:text-xs text-slate-600">
+                <p className="text-[11px] sm:text-xs text-slate-600 mt-1 break-words">{company.businessAddress}</p>
+                <p className="text-[11px] sm:text-xs text-slate-600 break-words">
                   Tel: {company.phone} | Email: {company.email} {company.website ? `| ${company.website}` : ''}
                 </p>
-                <p className="text-[10px] sm:text-[11px] text-slate-500 mt-1">
+                <p className="text-[10px] sm:text-[11px] text-slate-500 mt-1 break-words">
                   Reg No: {company.registrationNumber} {company.taxNumber ? `| Tax No: ${company.taxNumber}` : ''}
                 </p>
               </div>
@@ -202,12 +212,12 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
             {(type === 'Invoice' || type === 'Quotation') && (
               <>
                 <div className="flex flex-col sm:flex-row justify-between mb-6 sm:mb-8 gap-4 sm:gap-0">
-                  <div>
+                  <div className="min-w-0 flex-1 break-words pr-2">
                     <p className="text-[10px] sm:text-xs uppercase tracking-wider font-semibold text-slate-500">Billed To:</p>
-                    <p className="text-sm sm:text-base font-bold text-slate-900 mt-1">{data.customerName || 'N/A'}</p>
-                    {data.customerEmail && <p className="text-[11px] sm:text-xs text-slate-600">{data.customerEmail}</p>}
-                    {data.customerPhone && <p className="text-[11px] sm:text-xs text-slate-600">{data.customerPhone}</p>}
-                    {data.customerAddress && <p className="text-[11px] sm:text-xs text-slate-600 mt-1">{data.customerAddress}</p>}
+                    <p className="text-sm sm:text-base font-bold text-slate-900 mt-1 break-words">{data.customerName || 'N/A'}</p>
+                    {data.customerEmail && <p className="text-[11px] sm:text-xs text-slate-600 break-words">{data.customerEmail}</p>}
+                    {data.customerPhone && <p className="text-[11px] sm:text-xs text-slate-600 break-words">{data.customerPhone}</p>}
+                    {data.customerAddress && <p className="text-[11px] sm:text-xs text-slate-600 mt-1 break-words">{data.customerAddress}</p>}
                   </div>
                   <div className="sm:text-right text-[11px] sm:text-xs text-slate-700 space-y-1">
                     <p><strong>Date:</strong> {data.date}</p>
@@ -222,8 +232,8 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
                 </div>
 
                 {/* Responsive Table */}
-                <div className="overflow-x-auto mb-6 sm:mb-8 w-full max-w-[100%]">
-                  <table className="w-full text-[10px] sm:text-sm border-collapse min-w-full">
+                <div className="overflow-x-auto mb-6 sm:mb-8 w-full">
+                  <table className="w-full text-[10px] sm:text-sm border-collapse min-w-[300px]">
                     <thead>
                       <tr className="text-white text-left font-semibold" style={{ backgroundColor: primaryColor }}>
                         <th className="p-1 sm:p-3 text-center w-6 sm:w-12">#</th>
