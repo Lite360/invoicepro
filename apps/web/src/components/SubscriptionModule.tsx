@@ -83,6 +83,14 @@ function PayButton({
     amount, // kobo
     publicKey: PAYSTACK_PUBLIC_KEY,
     currency: 'NGN',
+    metadata: {
+      plan,
+      cycle,
+      custom_fields: [
+        { display_name: 'Plan', variable_name: 'plan', value: plan },
+        { display_name: 'Cycle', variable_name: 'cycle', value: cycle },
+      ],
+    },
   };
 
   const initializePayment = usePaystackPayment(config);

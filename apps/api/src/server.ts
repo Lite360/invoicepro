@@ -1029,6 +1029,75 @@ async function main() {
         return reply.send({ pricing });
     });
 
+    // ── Paystack Webhook ────────────────────────────────────────────
+    // Paystack sends events here; we verify the HMAC-SHA512 signature
+    // and handle 'charge.success' to upgrade the user's plan automatically.
+    app.post('/api/payments/webhook', async (req, reply) => {
+        const secret = process.env.PAYSTACK_SECRET_KEY;
+        if (!secret) return reply.status(500).send({ error: 'Not configured' });
+
+        // Verify Paystack signature
+        const signature = req.headers['x-paystack-signature'] as string;
+        if (!signature) return reply.status(400).send({ error: 'Missing signature' });
+
+        const crypto = await import('crypto');
+        const hash = crypto.createHmac('sha512', secret)
+            .update(JSON.stringify(req.body))
+            .digest('hex');
+
+        if (hash !== signature) {
+            return reply.status(401).send({ error: 'Invalid signature' });
+        }
+
+        const event = req.body as any;
+
+        // Handle successful charge
+        if (event.event === 'charge.success') {
+            const txn = event.data;
+            const userEmail = txn?.customer?.email;
+            const reference = txn?.reference;
+            const amountKobo = txn?.amount || 0;
+            const amountNGN = amountKobo / 100;
+            const metadata = txn?.metadata || {};
+            const plan  = (metadata.plan  || 'PRO').toUpperCase();
+            const cycle =  metadata.cycle || 'monthly';
+
+            if (userEmail) {
+                const user = await prisma.user.findUnique({ where: { email: userEmail } });
+                if (user) {
+                    const expiry = new Date();
+                    if (cycle === 'weekly') expiry.setDate(expiry.getDate() + 7);
+                    else if (cycle === 'yearly') expiry.setFullYear(expiry.getFullYear() + 1);
+                    else expiry.setMonth(expiry.getMonth() + 1);
+
+                    await (prisma.user as any).update({
+                        where: { id: user.id },
+                        data: { plan, planExpiry: expiry }
+                    });
+
+                    // Avoid duplicate payment records
+                    const existing = await (prisma as any).payment.findFirst({ where: { reference } });
+                    if (!existing) {
+                        await (prisma as any).payment.create({
+                            data: {
+                                userId: user.id,
+                                userName: user.name,
+                                userEmail: user.email,
+                                plan,
+                                amount: amountNGN,
+                                currency: txn?.currency || 'NGN',
+                                status: 'Confirmed',
+                                reference
+                            }
+                        });
+                    }
+                }
+            }
+        }
+
+        return reply.status(200).send({ received: true });
+    });
+
     // ── Paystack Verify ─────────────────────────────────────────────
     app.post('/api/payments/verify', async (req, reply) => {
         try { await req.jwtVerify(); } catch { return reply.status(401).send({ error: 'Unauthorized' }); }
