@@ -80,8 +80,6 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
       if (!printEl) return;
 
       const originalClasses = printEl.className;
-      const originalStyle = printEl.getAttribute('style') || '';
-      
       // Strip classes that interfere with PDF bounds or add unnecessary visual frames
       printEl.className = originalClasses
         .replace(/print:[^\s]+/g, '')
@@ -89,13 +87,7 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
         .replace('shadow-xl', '')
         .replace('border-slate-200', '')
         .replace('border', '')
-        .replace('rounded-xl', '')
-        .replace(/w-full/g, '')
-        .replace(/max-w-[^\s]+/g, '');
-        
-      // Temporarily force A4 width for the PDF generator so it doesn't look like a mobile view
-      printEl.style.width = '794px';
-      printEl.style.maxWidth = '794px';
+        .replace('rounded-xl', '');
       
       // @ts-ignore
       const opt = {
@@ -110,7 +102,6 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
       await html2pdf().set(opt).from(printEl).save();
       
       printEl.className = originalClasses;
-      printEl.setAttribute('style', originalStyle);
     } catch (e) {
       console.error('Frontend PDF Generation failed', e);
     }
@@ -122,45 +113,45 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 no-print overflow-hidden">
-      <div className="bg-white rounded-2xl shadow-2xl w-[95vw] max-w-[794px] h-[95vh] flex flex-col overflow-hidden border border-slate-100 relative">
+    <div className="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto no-print">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden border border-slate-100">
         {/* Modal Header */}
-        <div className="px-4 sm:px-6 py-3 sm:py-4 bg-slate-900 text-white flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-800 gap-3">
-          <div className="flex items-center justify-between sm:justify-start w-full sm:w-auto">
+        <div className="px-6 py-4 bg-slate-900 text-white flex flex-col md:flex-row md:items-center justify-between border-b border-slate-800 gap-4">
+          <div className="flex items-center justify-between md:justify-start w-full md:w-auto">
             <div className="flex items-center space-x-3">
-              <div className="p-2 bg-blue-600/20 text-blue-400 rounded-lg flex-shrink-0">
-                <FileText className="w-4 h-4 sm:w-5 sm:h-5" />
+              <div className="p-2 bg-blue-600/20 text-blue-400 rounded-lg">
+                <FileText className="w-5 h-5" />
               </div>
-              <div className="min-w-0">
-                <h3 className="font-semibold text-base sm:text-lg truncate">{type} Preview</h3>
-                <p className="text-xs text-slate-400 truncate"># {data.number}</p>
+              <div>
+                <h3 className="font-semibold text-lg">{type} Preview</h3>
+                <p className="text-xs text-slate-400"># {data.number}</p>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="sm:hidden p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition flex-shrink-0"
+              className="md:hidden p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={handlePrint}
-              className="flex-1 sm:flex-none flex items-center justify-center space-x-1.5 px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm font-medium rounded-lg transition"
+              className="flex items-center space-x-1.5 px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium rounded-lg transition"
             >
               <Printer className="w-4 h-4" />
-              <span>Print</span>
+              <span className="hidden sm:inline">Print</span>
             </button>
             <button
               onClick={handleDownloadPDF}
-              className="flex-1 sm:flex-none flex items-center justify-center space-x-1.5 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-medium rounded-lg shadow-lg shadow-blue-600/30 transition"
+              className="flex items-center space-x-1.5 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-lg shadow-lg shadow-blue-600/30 transition"
             >
               <Download className="w-4 h-4" />
-              <span>Download PDF</span>
+              <span>PDF</span>
             </button>
             <button
               onClick={onClose}
-              className="hidden sm:block p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition flex-shrink-0"
+              className="hidden md:block p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition"
             >
               <X className="w-5 h-5" />
             </button>
@@ -168,11 +159,10 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
         </div>
 
         {/* Printable Document View */}
-        <div className="flex-1 overflow-x-hidden overflow-y-auto p-2 sm:p-6 lg:p-8 bg-slate-100 w-full relative">
+        <div className="flex-1 overflow-auto p-4 md:p-8 bg-slate-100">
           <div
             id="printable-document"
-            className="bg-white mx-auto shadow-xl rounded-xl p-4 sm:p-8 lg:p-10 w-full max-w-[794px] box-border relative min-h-[297mm] print:min-h-0 print:p-8 print:shadow-none print:border-none print:m-0 text-slate-800 border border-slate-200 overflow-hidden"
-            style={{ boxSizing: 'border-box' }}
+            className="bg-white mx-auto shadow-xl rounded-xl p-10 w-[800px] max-w-none relative min-h-[297mm] print:min-h-0 print:p-8 print:shadow-none print:border-none print:m-0 print:w-full text-slate-800 border border-slate-200"
           >
             {/* Watermark */}
             {company.watermarkUrl && (
@@ -184,42 +174,42 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
             )}
 
             {/* Header */}
-            <div className="border-b-2 pb-4 sm:pb-6 mb-6 sm:mb-8 flex flex-col sm:flex-row justify-between items-start gap-3 sm:gap-0" style={{ borderColor: primaryColor }}>
-              <div className="min-w-0 flex-1 break-words">
+            <div className="border-b-2 pb-6 mb-8 flex justify-between items-start" style={{ borderColor: primaryColor }}>
+              <div>
                 {company.logoUrl && (
-                  <img src={company.logoUrl} alt="Logo" className="max-h-12 sm:max-h-16 mb-2 sm:mb-3 object-contain" />
+                  <img src={company.logoUrl} alt="Logo" className="max-h-16 mb-3 object-contain" />
                 )}
-                <h1 className="text-lg sm:text-2xl font-bold tracking-tight break-words" style={{ color: primaryColor }}>
+                <h1 className="text-2xl font-bold tracking-tight" style={{ color: primaryColor }}>
                   {company.companyName}
                 </h1>
-                <p className="text-[11px] sm:text-xs text-slate-600 mt-1 break-words">{company.businessAddress}</p>
-                <p className="text-[11px] sm:text-xs text-slate-600 break-words">
+                <p className="text-xs text-slate-600 mt-1">{company.businessAddress}</p>
+                <p className="text-xs text-slate-600">
                   Tel: {company.phone} | Email: {company.email} {company.website ? `| ${company.website}` : ''}
                 </p>
-                <p className="text-[10px] sm:text-[11px] text-slate-500 mt-1 break-words">
+                <p className="text-[11px] text-slate-500 mt-1">
                   Reg No: {company.registrationNumber} {company.taxNumber ? `| Tax No: ${company.taxNumber}` : ''}
                 </p>
               </div>
-              <div className="sm:text-right flex-shrink-0">
-                <h2 className="text-2xl sm:text-3xl font-extrabold tracking-wider" style={{ color: secondaryColor }}>
+              <div className="text-right">
+                <h2 className="text-3xl font-extrabold tracking-wider" style={{ color: secondaryColor }}>
                   {docTitle}
                 </h2>
-                <p className="text-xs sm:text-sm font-bold text-slate-900 mt-1"># {data.number}</p>
+                <p className="text-sm font-bold text-slate-900 mt-1"># {data.number}</p>
               </div>
             </div>
 
             {/* Body Details */}
             {(type === 'Invoice' || type === 'Quotation') && (
               <>
-                <div className="flex flex-col sm:flex-row justify-between mb-6 sm:mb-8 gap-4 sm:gap-0">
-                  <div className="min-w-0 flex-1 break-words pr-2">
-                    <p className="text-[10px] sm:text-xs uppercase tracking-wider font-semibold text-slate-500">Billed To:</p>
-                    <p className="text-sm sm:text-base font-bold text-slate-900 mt-1 break-words">{data.customerName || 'N/A'}</p>
-                    {data.customerEmail && <p className="text-[11px] sm:text-xs text-slate-600 break-words">{data.customerEmail}</p>}
-                    {data.customerPhone && <p className="text-[11px] sm:text-xs text-slate-600 break-words">{data.customerPhone}</p>}
-                    {data.customerAddress && <p className="text-[11px] sm:text-xs text-slate-600 mt-1 break-words">{data.customerAddress}</p>}
+                <div className="flex justify-between mb-8">
+                  <div>
+                    <p className="text-xs uppercase tracking-wider font-semibold text-slate-500">Billed To:</p>
+                    <p className="text-base font-bold text-slate-900 mt-1">{data.customerName || 'N/A'}</p>
+                    {data.customerEmail && <p className="text-xs text-slate-600">{data.customerEmail}</p>}
+                    {data.customerPhone && <p className="text-xs text-slate-600">{data.customerPhone}</p>}
+                    {data.customerAddress && <p className="text-xs text-slate-600 mt-1">{data.customerAddress}</p>}
                   </div>
-                  <div className="sm:text-right text-[11px] sm:text-xs text-slate-700 space-y-1">
+                  <div className="text-right text-xs text-slate-700 space-y-1">
                     <p><strong>Date:</strong> {data.date}</p>
                     <p><strong>Due Date:</strong> {data.dueDate}</p>
                     {data.projectTitle && <p><strong>Project:</strong> {data.projectTitle}</p>}
@@ -231,38 +221,35 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
                   </div>
                 </div>
 
-                {/* Responsive Table */}
-                <div className="overflow-x-auto mb-6 sm:mb-8 w-full">
-                  <table className="w-full text-[10px] sm:text-sm border-collapse min-w-[300px]">
-                    <thead>
-                      <tr className="text-white text-left font-semibold" style={{ backgroundColor: primaryColor }}>
-                        <th className="p-1 sm:p-3 text-center w-6 sm:w-12">#</th>
-                        <th className="p-1 sm:p-3">Item Description</th>
-                        <th className="p-1 sm:p-3 text-center w-8 sm:w-20">Qty</th>
-                        <th className="p-1 sm:p-3 text-right w-16 sm:w-28">Unit Price</th>
-                        <th className="p-1 sm:p-3 text-right w-16 sm:w-32">Amount</th>
+                <table className="w-full text-sm mb-8 border-collapse">
+                  <thead>
+                    <tr className="text-white text-left font-semibold" style={{ backgroundColor: primaryColor }}>
+                      <th className="p-3 text-center w-12">#</th>
+                      <th className="p-3">Item Description</th>
+                      <th className="p-3 text-center w-20">Qty</th>
+                      <th className="p-3 text-right w-28">Unit Price</th>
+                      <th className="p-3 text-right w-32">Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200">
+                    {(data.items || []).map((item: any, idx: number) => (
+                      <tr key={idx}>
+                        <td className="p-3 text-center text-slate-500">{idx + 1}</td>
+                        <td className="p-3 font-medium text-slate-800">{item.description}</td>
+                        <td className="p-3 text-center text-slate-600">{item.quantity}</td>
+                        <td className="p-3 text-right text-slate-600">
+                          {currencySymbol}{Number(item.unitPrice || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                        </td>
+                        <td className="p-3 text-right font-semibold text-slate-900">
+                          {currencySymbol}{Number(item.amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-200">
-                      {(data.items || []).map((item: any, idx: number) => (
-                        <tr key={idx}>
-                          <td className="p-1 sm:p-3 text-center text-slate-500">{idx + 1}</td>
-                          <td className="p-1 sm:p-3 font-medium text-slate-800 break-words">{item.description}</td>
-                          <td className="p-1 sm:p-3 text-center text-slate-600">{item.quantity}</td>
-                          <td className="p-1 sm:p-3 text-right text-slate-600 truncate">
-                            {currencySymbol}{Number(item.unitPrice || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
-                          </td>
-                          <td className="p-1 sm:p-3 text-right font-semibold text-slate-900 truncate">
-                            {currencySymbol}{Number(item.amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                    ))}
+                  </tbody>
+                </table>
 
-                <div className="flex justify-end mb-6 sm:mb-8">
-                  <div className="w-full sm:w-72 space-y-2 text-xs sm:text-sm">
+                <div className="flex justify-end mb-8">
+                  <div className="w-72 space-y-2 text-sm">
                     <div className="flex justify-between text-slate-600">
                       <span>Subtotal:</span>
                       <span className="font-semibold">{currencySymbol}{Number(data.subtotal || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
@@ -279,7 +266,7 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
                         <span>+{currencySymbol}{Number(data.vatAmount).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
                       </div>
                     )}
-                    <div className="flex justify-between pt-3 border-t-2 font-bold text-base sm:text-lg" style={{ borderColor: primaryColor, color: primaryColor }}>
+                    <div className="flex justify-between pt-3 border-t-2 font-bold text-lg" style={{ borderColor: primaryColor, color: primaryColor }}>
                       <span>Grand Total:</span>
                       <span>{currencySymbol}{Number(data.grandTotal || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
                     </div>
@@ -287,12 +274,12 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
                 </div>
 
                 {data.notes && (
-                  <div className="text-[11px] sm:text-xs text-slate-600 mb-4">
+                  <div className="text-xs text-slate-600 mb-4">
                     <strong>Notes:</strong> {data.notes}
                   </div>
                 )}
                 {data.paymentInstructions && (
-                  <div className="text-[11px] sm:text-xs text-slate-600 mb-6">
+                  <div className="text-xs text-slate-600 mb-6">
                     <strong>Payment Instructions:</strong> {data.paymentInstructions}
                   </div>
                 )}
@@ -301,25 +288,25 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
 
             {type === 'Receipt' && (
               <>
-                <div className="flex flex-col sm:flex-row justify-between mb-6 sm:mb-8 pb-4 sm:pb-6 border-b border-slate-200 gap-4 sm:gap-0">
+                <div className="flex justify-between mb-8 pb-6 border-b border-slate-200">
                   <div>
-                    <p className="text-[10px] sm:text-xs uppercase tracking-wider font-semibold text-slate-500">Received From:</p>
-                    <p className="text-lg sm:text-xl font-bold text-slate-900 mt-1">{data.customerName || 'N/A'}</p>
+                    <p className="text-xs uppercase tracking-wider font-semibold text-slate-500">Received From:</p>
+                    <p className="text-xl font-bold text-slate-900 mt-1">{data.customerName || 'N/A'}</p>
                   </div>
-                  <div className="sm:text-right text-[11px] sm:text-xs text-slate-700 space-y-1">
+                  <div className="text-right text-xs text-slate-700 space-y-1">
                     <p><strong>Payment Date:</strong> {data.paymentDate}</p>
                     <p><strong>Payment Method:</strong> {data.paymentMethod}</p>
                     {data.referenceNumber && <p><strong>Ref #:</strong> {data.referenceNumber}</p>}
                   </div>
                 </div>
 
-                <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 sm:p-8 text-center mb-6 sm:mb-8">
-                  <p className="text-[10px] sm:text-xs uppercase tracking-widest text-slate-500 font-semibold">Amount Received</p>
-                  <p className="text-3xl sm:text-4xl font-extrabold text-emerald-600 mt-2">
+                <div className="bg-slate-50 border border-slate-200 rounded-xl p-8 text-center mb-8">
+                  <p className="text-xs uppercase tracking-widest text-slate-500 font-semibold">Amount Received</p>
+                  <p className="text-4xl font-extrabold text-emerald-600 mt-2">
                     {currencySymbol}{Number(data.amountPaid || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                   </p>
                   {data.balance > 0 ? (
-                    <p className="text-xs sm:text-sm font-semibold text-rose-600 mt-2">
+                    <p className="text-sm font-semibold text-rose-600 mt-2">
                       Remaining Balance: {currencySymbol}{Number(data.balance).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                     </p>
                   ) : (
@@ -328,7 +315,7 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
                 </div>
 
                 {data.notes && (
-                  <p className="text-[11px] sm:text-xs text-slate-600 mb-6">
+                  <p className="text-xs text-slate-600 mb-6">
                     <strong>Notes:</strong> {data.notes}
                   </p>
                 )}
@@ -337,29 +324,29 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
 
             {type === 'Letter' && (
               <>
-                <div className="mb-6 sm:mb-8">
-                  <p className="text-[11px] sm:text-xs text-slate-600"><strong>Date:</strong> {data.date}</p>
+                <div className="mb-8">
+                  <p className="text-xs text-slate-600"><strong>Date:</strong> {data.date}</p>
                   <div className="mt-4">
-                    <p className="text-[10px] sm:text-xs uppercase tracking-wider font-semibold text-slate-500">To:</p>
-                    <p className="text-sm sm:text-base font-bold text-slate-900 mt-1">{data.recipientName}</p>
-                    {data.recipientTitle && <p className="text-[11px] sm:text-xs text-slate-600">{data.recipientTitle}</p>}
-                    {data.recipientAddress && <p className="text-[11px] sm:text-xs text-slate-600">{data.recipientAddress}</p>}
+                    <p className="text-xs uppercase tracking-wider font-semibold text-slate-500">To:</p>
+                    <p className="text-base font-bold text-slate-900 mt-1">{data.recipientName}</p>
+                    {data.recipientTitle && <p className="text-xs text-slate-600">{data.recipientTitle}</p>}
+                    {data.recipientAddress && <p className="text-xs text-slate-600">{data.recipientAddress}</p>}
                   </div>
                 </div>
 
-                <div className="text-sm sm:text-base font-bold mb-4 sm:mb-6 pb-2 border-b-2" style={{ color: primaryColor, borderColor: secondaryColor }}>
+                <div className="text-base font-bold mb-6 pb-2 border-b-2" style={{ color: primaryColor, borderColor: secondaryColor }}>
                   SUBJECT: {data.subject}
                 </div>
 
-                <div className="text-xs sm:text-sm leading-relaxed text-slate-700 whitespace-pre-wrap mb-10 sm:mb-12">
+                <div className="text-sm leading-relaxed text-slate-700 whitespace-pre-wrap mb-12">
                   {data.body}
                 </div>
               </>
             )}
 
             {/* Signature & Bank Footer */}
-            <div className="mt-8 sm:mt-12 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 pt-4 sm:pt-6 border-t border-slate-100">
-              <div className="text-[11px] sm:text-xs text-slate-600 bg-slate-50 p-3 sm:p-4 rounded-lg border border-slate-200 w-full sm:w-auto">
+            <div className="mt-12 flex justify-between items-end pt-6 border-t border-slate-100">
+              <div className="text-xs text-slate-600 bg-slate-50 p-4 rounded-lg border border-slate-200">
                 <p className="font-bold mb-1" style={{ color: primaryColor }}>BANKING DETAILS</p>
                 <p><strong>Bank:</strong> {company.bankName}</p>
                 <p><strong>Account Name:</strong> {company.accountName}</p>
@@ -367,9 +354,9 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
               </div>
 
               {company.signatureUrl && (type !== 'Letter' || data.showSignature !== false) && (
-                <div className="text-center self-end">
-                  <img src={company.signatureUrl} alt="Signature" className="max-h-12 sm:max-h-14 mx-auto mb-1" />
-                  <div className="border-t border-slate-400 w-36 sm:w-44 pt-1 text-[11px] sm:text-xs font-semibold text-slate-700">
+                <div className="text-center">
+                  <img src={company.signatureUrl} alt="Signature" className="max-h-14 mx-auto mb-1" />
+                  <div className="border-t border-slate-400 w-44 pt-1 text-xs font-semibold text-slate-700">
                     Authorized Signature
                   </div>
                 </div>
@@ -377,9 +364,9 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
             </div>
 
             {/* Footer Text */}
-            <div className="mt-6 sm:mt-12 pt-4 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-1 text-[10px] sm:text-[11px] text-slate-500">
-              <span className="text-center sm:text-left">{company.footerText || `${company.companyName} - Thank you for your business!`}</span>
-              <span className="flex-shrink-0">Page 1 of 1</span>
+            <div className="mt-12 pt-4 border-t border-slate-200 flex justify-between items-center text-[11px] text-slate-500">
+              <span>{company.footerText || `${company.companyName} - Thank you for your business!`}</span>
+              <span>Page 1 of 1</span>
             </div>
           </div>
         </div>
