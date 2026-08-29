@@ -73,6 +73,17 @@ export function App() {
       const res = await fetch('/api/company', {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
+
+      // If account no longer exists in DB (e.g. after a reset), auto-logout
+      if (res.status === 401) {
+        localStorage.removeItem('invoicepro_token');
+        localStorage.removeItem('invoicepro_user');
+        setUser(null);
+        setSetupRequired(null);
+        setPageView('login');
+        return;
+      }
+
       const data = await res.json();
       if (data.maintenanceMode !== undefined) setMaintenanceMode(data.maintenanceMode);
       if (data.setupRequired) {

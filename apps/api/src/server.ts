@@ -192,7 +192,14 @@ async function main() {
 
     app.get('/api/company', { preValidation: [isAuth] }, async (req: any, reply: any) => {
         const userId = (req.user as any).id;
-        const company = await prisma.company.findUnique({ where: { userId: (req.user as any)?.id || userId } });
+
+        // Check user still exists in DB (handles DB resets / deleted accounts)
+        const userExists = await prisma.user.findUnique({ where: { id: userId }, select: { id: true } });
+        if (!userExists) {
+            return reply.status(401).send({ error: 'Account not found. Please log in again.' });
+        }
+
+        const company = await prisma.company.findUnique({ where: { userId } });
         let isMaintenance = false;
         try {
             const settings = await (prisma as any).adminSettings.findUnique({ where: { id: 'global' } });
